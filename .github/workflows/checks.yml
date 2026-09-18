@@ -1,0 +1,36 @@
+name: Source checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: source-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source:
+    runs-on: macos-26
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain evidence
+        run: |
+          xcode-select -p
+          swift --version
+          xcrun --show-sdk-version
+      - name: Repository checks
+        run: ./scripts/check-source.sh
+      - name: Core checks and application source typecheck
+        run: ./scripts/typecheck-app.sh
+  build:
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Build and verify application with Command Line Tools
+        env:
+          CODESIGN_IDENTITY: "-"
+        run: ./build.sh --no-install

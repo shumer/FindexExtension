@@ -1,0 +1,6 @@
+{
+  "name": "FinderPack",
+  "bundleIdentifier": "com.shumer.finderpack",
+  "deploymentTarget": "14.0",
+  "swiftVersion": "6"
+}
