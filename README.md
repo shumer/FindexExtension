@@ -17,9 +17,7 @@ as usual; open the FinderPack app when you want to change its settings.
 
 ![FinderPack settings showing path copying, file creation, moving and hidden-file commands](docs/images/menu-settings.png)
 
-*Real screenshots from development build 14, using the English interface. The public
-release is currently v0.1.1 (build 13). Individual command hiding, Favorite Folders and
-Setup status are implemented on `main` and will arrive in a later release.*
+*Screenshots show FinderPack with the English interface.*
 
 ## What can I do with it?
 
@@ -55,8 +53,8 @@ You do not need Xcode, Homebrew or a developer account to install a release.
    **Copy Path**, **Open In** and **Move**. Close and reopen the menu after changing
    settings; updates can take up to five seconds.
 
-In v0.1.1, setup controls appear when the extension or helper needs attention.
-In the upcoming version, they have a dedicated **Setup** page, shown below.
+Use the **Setup** page to check extension activation, helper connectivity and optional
+permissions. A screenshot of this page appears below.
 
 Release downloads are Developer ID signed and notarized by Apple. If macOS reports
 that a download is damaged or cannot be verified, download it again from the release
@@ -87,7 +85,7 @@ In **Menu**, choose which command groups appear and change their order. In
 **Applications**, hide editors or terminals you do not use. Only detected applications
 appear in Finder's Open In menu.
 
-**Coming in the next release:** expand the path or move options to hide individual
+Expand the path or move options to hide individual
 commands. Hide a template from its editor without deleting the template file.
 These choices affect Finder menus; your recorded shortcuts keep working.
 
@@ -99,15 +97,13 @@ entry's menu label, icon and order to suit your work.
 
 ![Template editor with a Markdown template and a filename placeholder](docs/images/templates.png)
 
-*The Show template in Finder checkbox shown here is part of the upcoming release.*
-
 Built-in templates include plain text, Markdown, JSON, JavaScript, TypeScript, PHP,
 shell, `.env` and `.gitignore`. Use `{{date}}`, `{{filename}}` or `{{author}}` in text
 for automatic substitutions. See [all template tokens and limits](docs/usage.md#templates).
 
 ### Pin folders you move to often
 
-**Coming in the next release:** open **Favorite Folders > Add Folders**, select your
+Open **Favorite Folders > Add Folders**, select your
 usual destinations, then give them short labels and arrange them with the arrows.
 Up to 20 favorites appear before the five recent destinations in the Move menu.
 
@@ -116,7 +112,7 @@ the move stops. Re-add a favorite after moving or renaming its folder.
 
 ### See what still needs setup
 
-**Coming in the next release:** **Setup** checks the Finder extension, background helper
+**Setup** checks the Finder extension, background helper
 connection and optional permissions. If something needs attention, use the button
 beside it to connect the helper or open the relevant macOS settings.
 

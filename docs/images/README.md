@@ -8,7 +8,7 @@ captures, without compositing, retouching or generated UI.
 - `templates.png`: the built-in Markdown template in the editor.
 - `setup.png`: extension, helper and optional permission status.
 
-The main README labels features that are newer than public v0.1.1 build 13.
+These screens show the interface included in v0.1.2.
 Keep all README screenshots in English. When replacing these images, use sample content
 and check that no personal paths, file history, credentials or unrelated applications
 are visible.
