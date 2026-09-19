@@ -7,7 +7,8 @@ opening files in applications and moving files with recovery history.
 
 macOS 14 or later. Release builds contain Apple Silicon and Intel binaries. Runtime testing
 currently covers Apple Silicon on macOS 26.6.2; other supported systems still need acceptance
-checks. The project is in development and no stable public release has been published.
+checks. The initial public release is [v0.1.0](https://github.com/shumer/FindexExtension/releases/tag/v0.1.0).
+Clean-machine installation and broader runtime acceptance are still being tested.
 
 ## Features
 

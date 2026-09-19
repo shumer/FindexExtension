@@ -368,3 +368,21 @@ accessibility, permission-denial and adapter acceptance checks.
 
 Sparkle documents the temporary feed override in its
 [updater API](https://sparkle-project.org/documentation/api-reference/Classes/SPUUpdater.html).
+
+## Public release and reinstall handoff, 2026-09-19
+
+Published [v0.1.0 build 8](https://github.com/shumer/FindexExtension/releases/tag/v0.1.0)
+at 10:31:36 UTC following the owner's explicit request. The five verified CI assets
+were preserved unchanged. The public release notes explain installation and remaining
+runtime-acceptance limits.
+
+Before the handoff, disconnected the helper in Settings, quit FinderPack, unregistered
+its extension, and moved the installed build 9 and remaining generated app bundles to
+the macOS Trash. Preferences, templates and recovery history were retained. The owner
+will download the DMG in a browser and test the normal downloaded-app launch path.
+This is a reinstall on the development Mac, not a clean-machine or fresh-permissions test.
+
+Downloaded the DMG anonymously from its public version-specific URL and confirmed its
+SHA-256 matches the verified CI asset. The public `releases/latest/download/appcast.xml`
+URL resolves successfully and advertises the expected version-specific build 8 ZIP.
+The local anonymous-download checks are in `build/public-release-check`.

@@ -1,6 +1,6 @@
 # Release procedure
 
-Status: signed-release CI passed for v0.1.0, build 8, on 2026-09-19. GitHub credentials and the Sparkle key pair were validated by the workflow. The draft contains a signed, notarized and stapled universal app and DMG, an EdDSA-signed update archive, checksums and build metadata. No stable release has been published. Build 8 was installed from the CI draft and updated through Sparkle to local notarized build 9. Build 9 is now installed; the public release remains a draft. See `docs/verification.md` for evidence and remaining acceptance checks.
+Status: v0.1.0 build 8 was published on 2026-09-19 after successful signed CI, artifact verification and a local build 8-to-9 Sparkle lifecycle test. The public assets remain the immutable CI build 8 artifacts. The local installation was removed with user data retained so the owner can test a browser download and reinstall. Clean-machine and broader platform acceptance remain open. See `docs/verification.md` for evidence.
 
 ## Prerequisites
 

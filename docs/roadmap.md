@@ -41,6 +41,8 @@
   feed, with the helper and Finder extension active. Automatic reconnection, extension
   replacement, data preservation and post-update file creation passed.
 
+- Published v0.1.0 build 8 and checked anonymous DMG download and the public latest feed.
+
 ## Remaining acceptance gates
 
 - Expand installed action coverage beyond the verified template creation and move/undo flows.
@@ -49,9 +51,9 @@
   Initial locale and light/dark spot checks passed; see verification evidence.
 - Check notification permission denial/delivery and shortcut Automation prompts.
 - Check macOS 14/15/26 and Intel runtime compatibility, cloud/network files and hotplug.
-- Verify the published HTTPS feed and download path after release publication.
-  The installed two-build lifecycle has passed using a temporary loopback feed.
+- Verify public update installation on another Mac. The local two-build lifecycle
+  passed using a loopback feed; anonymous public feed and artifact delivery were checked.
 - Complete quarantined-download, clean-machine installation and removal checks.
-- Publish a stable release and Homebrew cask after these gates pass.
+- Complete remaining acceptance checks for the initial public release, then add a Homebrew cask.
 
 Compilation, notarization and core tests do not replace installed UI or compatibility testing.
