@@ -7,7 +7,7 @@ opening files in applications and moving files with recovery history.
 
 macOS 14 or later. Release builds contain Apple Silicon and Intel binaries. Runtime testing
 currently covers Apple Silicon on macOS 26.6.2; other supported systems still need acceptance
-checks. The initial public release is [v0.1.0](https://github.com/shumer/FindexExtension/releases/tag/v0.1.0).
+checks. Download the latest signed version from [Releases](https://github.com/shumer/FindexExtension/releases/latest).
 Clean-machine installation and broader runtime acceptance are still being tested.
 
 ## Features
@@ -31,7 +31,7 @@ Clean-machine installation and broader runtime acceptance are still being tested
   Finder's native Command-Shift-Period command without restarting Finder. The title
   stays neutral because Finder does not expose a reliable live visibility state.
   Allow FinderPackAgent in System Settings > Privacy & Security > Accessibility
-  on first use, then retry the command. This feature is newer than release v0.1.0.
+  on first use, then retry the command. Available starting with v0.1.1.
 - **Shortcuts:** record combinations for copying a path and creating a file. No defaults.
   Finder-only registration is the default. Optional global shortcuts use the frontmost Finder window.
 

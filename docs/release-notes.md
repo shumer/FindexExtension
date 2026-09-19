@@ -1,17 +1,25 @@
-FinderPack adds native Finder commands for paths, file templates and file operations.
+## New in 0.1.1
 
-## Install
+- Added Show/Hide Hidden Files to Finder context menus, the Finder toolbar menu and
+  Menu settings. It sends Finder's native Command-Shift-Period shortcut without
+  restarting Finder or changing its saved preferences.
+- The command uses a neutral title without a checkmark because Finder's current
+  visibility can differ from its saved preference.
+- First use requires Accessibility access for FinderPackAgent in System Settings >
+  Privacy & Security > Accessibility. Grant access and retry the command.
 
-1. Download the DMG for your Mac's architecture.
-2. Open the image and drag FinderPack to Applications.
-3. Open FinderPack from Applications.
-4. Enable its Finder extension and connect the background helper when prompted.
-5. Open a new Finder context menu to use the commands.
+## Install or update
 
-The application and disk image must both be Developer ID signed, notarized and stapled
-before these assets can be attached by the release workflow. Do not remove quarantine
-attributes or disable Gatekeeper. If verification fails, report the failure instead.
+1. Download the universal DMG for Apple Silicon and Intel, requiring macOS 14 or later.
+2. Open it and drag FinderPack to Applications. For an existing installation, use
+   Check for Updates in FinderPack instead.
+3. Launch FinderPack from Applications, enable its Finder extension and connect the
+   background helper if this is your first installation.
+4. Open a new Finder context menu and choose Show/Hide Hidden Files.
 
-A draft is a release candidate, not a completed compatibility or upgrade test. Review
-build-info.json and the verification report before publishing. Automatic updates are not
-advertised until signed feed hosting and a two-version update test are completed.
+The application and disk image are Developer ID signed, notarized and stapled.
+Release assets include the signed Sparkle update archive, checksums and build metadata.
+Do not remove quarantine attributes or disable Gatekeeper.
+
+Runtime verification covers Apple Silicon on macOS 26.6.2. Intel and other supported
+macOS versions still require broader runtime acceptance.

@@ -66,4 +66,4 @@ Compilation, notarization and core tests do not replace installed UI or compatib
 - Added localized permission handling and nine core command-contract checks.
 - Installed command delivery passed from Menu settings, blank-space and file context
   menus, and the Finder toolbar. Finder kept PID 577 throughout.
-- The local signed/notarized build includes it; public v0.1.0 does not.
+- Included in the v0.1.1 release candidate; signed CI and publication are in progress.
