@@ -147,6 +147,9 @@ Finder extension activation and background helper registration are separate. Bas
 creation and path copying do not need Automation or Accessibility. Finder shortcuts and
 scripted terminal adapters ask for Automation when used. Notification permission is optional;
 errors remain visible when success notifications are disabled. Automatic rename is not used.
+The notification request waits up to five minutes for the system prompt and uses a separate
+connection so other settings remain available. If no result arrives, check Notifications in
+System Settings; retrying file operations is not necessary.
 
 ## Updates and removal
 

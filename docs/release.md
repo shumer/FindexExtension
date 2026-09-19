@@ -114,6 +114,56 @@ The pinned Sparkle tools are downloaded by `scripts/fetch-dependencies.py`. Use 
 script accepts the exported base64 private key, checks it against the public key with
 CryptoKit and sends it to `generate_appcast` through standard input.
 
+### Upload credentials without printing them
+
+Open the repository's Settings > Environments and create `release`. Add environment
+secrets there, or authenticate GitHub CLI with access to this repository and run:
+
+```sh
+base64 -i "/path/DeveloperID.p12" | gh secret set DEVELOPER_ID_P12 --repo shumer/FindexExtension --env release
+base64 -i "/path/AuthKey.p8" | gh secret set NOTARY_KEY_P8 --repo shumer/FindexExtension --env release
+gh secret set DEVELOPER_ID_P12_PASSWORD --repo shumer/FindexExtension --env release
+gh secret set NOTARY_KEY_ID --repo shumer/FindexExtension --env release
+gh secret set NOTARY_ISSUER_ID --repo shumer/FindexExtension --env release
+```
+
+The last three commands prompt for values. The P12 password is the export password,
+not the Mac login password. In Keychain Access, export the Developer ID Application
+certificate together with its private key as P12; a CER file alone cannot sign builds.
+The P8 file belongs to an App Store Connect team API key. Obtain its Key ID and Issuer
+ID from Users and Access > Integrations. Neither identifier is the Developer Team ID.
+The local `FinderPack` notarytool profile stays in the local Keychain and is not available
+to a GitHub runner.
+
+Create the dedicated Sparkle key once, then retain it across releases:
+
+```sh
+python3 scripts/fetch-dependencies.py
+.build/dependencies/Sparkle/bin/generate_keys --account FinderPack
+umask 077
+mkdir -p "$HOME/FinderPack-signing-backup"
+chmod 700 "$HOME/FinderPack-signing-backup"
+.build/dependencies/Sparkle/bin/generate_keys --account FinderPack -x "$HOME/FinderPack-signing-backup/sparkle-private-key.txt"
+gh secret set SPARKLE_PRIVATE_KEY --repo shumer/FindexExtension --env release < "$HOME/FinderPack-signing-backup/sparkle-private-key.txt"
+.build/dependencies/Sparkle/bin/generate_keys --account FinderPack -p | gh variable set SPARKLE_PUBLIC_KEY --repo shumer/FindexExtension
+```
+
+The exported Sparkle private key is already base64: do not encode it again. Keep its
+backup outside the repository in protected storage. The public key is a repository
+Actions variable, not an environment secret. Through the web UI, add it under Settings >
+Secrets and variables > Actions > Variables. Changing the key after distribution needs
+an update-key migration; do not generate replacement keys for each build.
+
+List configured names without revealing values:
+
+```sh
+gh secret list --repo shumer/FindexExtension --env release
+gh variable list --repo shumer/FindexExtension
+```
+
+See [GitHub environment secrets](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets)
+and [Sparkle key setup](https://sparkle-project.org/documentation/).
+
 The runner uses `macos-26`; compiler and SDK versions are recorded in build evidence rather
 than assumed from that label. Universal release binaries include arm64 and x86_64. The
 current local verification environment is Swift 6.4 with SDK 27.0; other available compiler

@@ -221,6 +221,7 @@ struct SettingsView: View {
         Form {
             Toggle("Show success notifications", isOn: $model.preferences.notifySuccess)
             Button("Allow Notifications", action: model.enableNotifications)
+                .disabled(model.requestingNotifications)
             Text("Errors are always shown. Notification permission does not affect file actions.").font(.callout)
         }.formStyle(.grouped)
     }

@@ -29,12 +29,17 @@
 - Sparkle appcast generation and independent ZIP signature verification with ephemeral keys.
 - Signed/notarized/stapled universal app and DMG, mounted image validation and checksums.
 - Installed Russian settings, template creation, Move To/undo, Cut/Paste and Move/undo.
+- English/Polish/Ukrainian settings spot checks, Russian light/dark menu and template editor,
+  sidebar arrow-key navigation and successful notification permission grant.
+- Opening the isolated text fixture through the Sublime Text adapter.
+- Separate notification setup connection with a five-minute permission wait and localized status.
 
 ## Remaining acceptance gates
 
 - Expand installed action coverage beyond the verified template creation and move/undo flows.
 - Verify third-party terminal adapters with their applications installed.
-- Check keyboard navigation, VoiceOver, light/dark appearance and four locales.
+- Complete keyboard traversal, VoiceOver and remaining dialogs across all four locales.
+  Initial locale and light/dark spot checks passed; see verification evidence.
 - Check notification permission denial/delivery and shortcut Automation prompts.
 - Check macOS 14/15/26 and Intel runtime compatibility, cloud/network files and hotplug.
 - Supply release environment secrets and the Sparkle public variable, then run signed CI.

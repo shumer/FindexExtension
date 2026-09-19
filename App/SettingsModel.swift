@@ -16,9 +16,11 @@ final class SettingsModel: ObservableObject {
     @Published var message = ""
     @Published var extensionEnabled = false
     @Published var agentEnabled = false
+    @Published var requestingNotifications = false
     @Published var failure: String?
     private var original: Data?
     private let client = ActionClient()
+    private let notificationClient = ActionClient()
     private let diagnostic = DiagnosticClient()
     private var service: SMAppService { .agent(plistName: "FinderPackAgent.plist") }
 
@@ -198,6 +200,12 @@ final class SettingsModel: ObservableObject {
     }
     func checkConnection() { diagnostic.ping { [weak self] in self?.message = $0 } }
     func enableNotifications() {
-        client.perform(ActionRequest(action: .enableNotifications)) { [weak self] in self?.message = $0.message }
+        guard !requestingNotifications else { return }
+        requestingNotifications = true
+        message = ProductText.value("notificationWaiting")
+        notificationClient.perform(ActionRequest(action: .enableNotifications)) { [weak self] reply in
+            self?.requestingNotifications = false
+            self?.message = reply.message
+        }
     }
 }

@@ -23,7 +23,8 @@ final class ActionClient {
             self.connection = connection
             self.completion = completion
             requestID = request.id
-            let failure = ActionReply(requestID: request.id, succeeded: false, message: ProductText.value("uncertain"))
+            let failure = ActionReply(requestID: request.id, succeeded: false,
+                                      message: ProductText.value(request.action == .enableNotifications ? "notificationUncertain" : "uncertain"))
             connection.invalidationHandler = { @Sendable [weak self] in
                 Task { @MainActor in self?.finish(failure) }
             }
@@ -32,7 +33,9 @@ final class ActionClient {
             }
             connection.resume()
             timeout = Task { [weak self] in
-                do { try await Task.sleep(for: .seconds([FileAction.moveTo, .undoMove, .pasteFiles, .pasteMove, .moveHere].contains(request.action) ? 86_400 : 15)) } catch { return }
+                let seconds = [FileAction.moveTo, .undoMove, .pasteFiles, .pasteMove, .moveHere].contains(request.action)
+                    ? 86_400 : (request.action == .enableNotifications || request.action == .openIn ? 300 : 15)
+                do { try await Task.sleep(for: .seconds(seconds)) } catch { return }
                 self?.finish(failure)
             }
             let proxy = connection.remoteObjectProxyWithErrorHandler { @Sendable [weak self] _ in
@@ -50,7 +53,8 @@ final class ActionClient {
                 Task { @MainActor in self?.finish(response) }
             }
         } catch {
-            completion(ActionReply(requestID: request.id, succeeded: false, message: ProductText.value("failed")))
+            completion(ActionReply(requestID: request.id, succeeded: false,
+                                   message: ProductText.value(request.action == .enableNotifications ? "notificationUncertain" : "failed")))
         }
     }
 

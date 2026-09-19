@@ -32,6 +32,8 @@ enum ProductText {
             "uncertain": ["The result is unknown. Check the folder or clipboard before trying again.", "Результат неизвестен. Проверьте папку или буфер обмена перед повтором.", "Результат невідомий. Перевірте теку або буфер обміну перед повтором.", "Wynik jest nieznany. Sprawdź folder lub schowek przed ponowną próbą."],
             "partial": ["Writing failed. A partial file may remain in the destination folder.", "Ошибка записи. В папке назначения мог остаться неполный файл.", "Помилка запису. У теці призначення міг залишитися неповний файл.", "Błąd zapisu. W folderze docelowym może pozostać niepełny plik."],
             "busy": ["An action is already running.", "Действие уже выполняется.", "Дія вже виконується.", "Działanie już trwa."],
+            "notificationUncertain": ["Notification permission could not be confirmed. Check Notifications in System Settings.", "Не удалось проверить разрешение уведомлений. Проверьте раздел «Уведомления» в Системных настройках.", "Не вдалося перевірити дозвіл на сповіщення. Перевірте розділ «Сповіщення» в Системних параметрах.", "Nie udało się potwierdzić uprawnień do powiadomień. Sprawdź Powiadomienia w Ustawieniach systemowych."],
+            "notificationWaiting": ["Waiting for notification permission. Respond to the macOS prompt if it appears.", "Ожидаем разрешение уведомлений. Ответьте на запрос macOS, если он появится.", "Очікуємо дозвіл на сповіщення. Дайте відповідь на запит macOS, якщо він з’явиться.", "Oczekiwanie na zgodę na powiadomienia. Odpowiedz na pytanie macOS, jeśli się pojawi."],
             "ok": ["OK", "ОК", "Гаразд", "OK"]
         ]
         return labels[key]?[index] ?? key

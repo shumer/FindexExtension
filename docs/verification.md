@@ -257,3 +257,40 @@ published stable release. Remaining gates include the real two-version Sparkle l
 system shortcut activation, permission-denial flows, additional locales/accessibility,
 third-party adapters and clean-machine/other-OS compatibility. GitHub release secrets and
 production update keys are still not configured.
+
+
+## Settings and permissions acceptance, 2026-09-19
+
+Checks used installed build 6 on the local Apple Silicon Mac.
+
+- Retried the notification request. After the user allowed it, the app reported
+  "Notifications enabled." Delivery of a success banner and the denied-permission
+  path are not yet confirmed.
+- The first request exposed a 15-second client timeout while macOS was still waiting
+  for a user decision. The client now allows five minutes for notification requests
+  and application launches that can display an Automation prompt. Notification setup
+  uses a separate connection, disables duplicate requests, displays a waiting message,
+  and reports a permission-specific failure instead of suggesting a file operation retry.
+- Switched the installed app through English, Polish and Ukrainian using the per-app
+  macOS language setting, then removed that override to restore Russian. Inspected
+  menu and shortcut controls through accessibility and checked English menu/templates,
+  Polish shortcuts and Ukrainian shortcuts visually. This is not exhaustive coverage
+  of every dialog in every language.
+- Checked Russian menu and template editor in dark appearance, then restored the
+  original light appearance. Visible controls and editor content remained readable.
+- Sidebar arrow-key navigation moved from Menu to Templates and Applications.
+  Localized controls, template content and shortcut recorder were exposed in the
+  accessibility tree. Full keyboard traversal and VoiceOver speech/navigation remain
+  acceptance items. VoiceOver briefly reported enabled, then returned to disabled;
+  its navigation could not be confirmed through the UI session.
+- The FinderPack item-context menu opened the exact isolated Destination/Text.txt file
+  in Sublime Text. Confirmed its file URL in the editor window. Other editor and terminal
+  adapters are not implied by this result.
+- Recorded a temporary Control-Option-Command-K shortcut (shown as Cyrillic L under
+  the Russian keyboard layout) for the user to test with a physical key press.
+  Do not count synthetic key delivery as proof of Carbon shortcut handling.
+
+The permission change passed 64 core checks, strict Swift typechecking and a universal
+Developer ID build. The rebuilt candidate is separate from installed build 6; delayed
+prompt behavior still needs a first-use check with that candidate. No stable release
+or production update key was created during these checks.
