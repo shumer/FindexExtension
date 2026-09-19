@@ -120,6 +120,9 @@ struct SettingsView: View {
             Toggle("Copy Path", isOn: $model.preferences.showCopy)
             Toggle("New File", isOn: $model.preferences.showNew)
             Toggle("Move", isOn: $model.preferences.showMove)
+            Button("Show/Hide Hidden Files", action: model.toggleHiddenFiles)
+                .disabled(!model.canToggleHiddenFiles || model.changingHiddenFiles)
+            Text("Uses Finder's Show/Hide shortcut without restarting it. Accessibility permission is required.").font(.callout)
             Section("Group order") {
                 ForEach(model.preferences.groupOrder, id: \.self) { group in
                     HStack {

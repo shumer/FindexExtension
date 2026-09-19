@@ -14,6 +14,8 @@ final class SettingsModel: ObservableObject {
     @Published var content = ""
     @Published var editable = false
     @Published var message = ""
+    @Published var canToggleHiddenFiles = false
+    @Published var changingHiddenFiles = false
     @Published var extensionEnabled = false
     @Published var agentEnabled = false
     @Published var requestingNotifications = false
@@ -21,6 +23,7 @@ final class SettingsModel: ObservableObject {
     private var original: Data?
     private let client = ActionClient()
     private let notificationClient = ActionClient()
+    private let visibilityClient = ActionClient()
     private let diagnostic = DiagnosticClient()
     private var service: SMAppService { .agent(plistName: "FinderPackAgent.plist") }
 
@@ -29,9 +32,13 @@ final class SettingsModel: ObservableObject {
     func reload() {
         extensionEnabled = FIFinderSyncController.isExtensionEnabled
         agentEnabled = service.status == .enabled
+        if !agentEnabled { canToggleHiddenFiles = false }
         if agentEnabled {
             client.perform(ActionRequest(action: .catalog)) { [weak self] reply in
-                if reply.succeeded { self?.applications = reply.applications ?? [] }
+                if reply.succeeded {
+                    self?.applications = reply.applications ?? []
+                    self?.canToggleHiddenFiles = reply.canToggleHiddenFiles == true
+                }
             }
         }
         do {
@@ -199,6 +206,15 @@ final class SettingsModel: ObservableObject {
         do { try service.unregister(); reload() } catch { failure = error.localizedDescription }
     }
     func checkConnection() { diagnostic.ping { [weak self] in self?.message = $0 } }
+    func toggleHiddenFiles() {
+        guard !changingHiddenFiles else { return }
+        changingHiddenFiles = true
+        visibilityClient.perform(ActionRequest(action: .toggleHiddenFiles)) { [weak self] reply in
+            self?.changingHiddenFiles = false
+            if !reply.succeeded { self?.failure = reply.message }
+        }
+    }
+
     func enableNotifications() {
         guard !requestingNotifications else { return }
         requestingNotifications = true

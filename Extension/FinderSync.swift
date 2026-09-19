@@ -9,6 +9,7 @@ final class FinderSync: FIFinderSync {
     @MainActor private static let catalogClient = ActionClient()
     private static let actions = OSAllocatedUnfairLock(initialState: (next: 1, values: [Int: String]()))
     private static let context = OSAllocatedUnfairLock(initialState: (target: Optional<URL>.none, gitTarget: Optional<URL>.none))
+    private static let canToggleHiddenFiles = OSAllocatedUnfairLock(initialState: false)
     private static let recents = OSAllocatedUnfairLock(initialState: [URL]())
     private static let applications = OSAllocatedUnfairLock(initialState: [ApplicationChoice]())
     private static let templates = OSAllocatedUnfairLock(initialState: (names: [String](), preferences: Preferences()))
@@ -48,6 +49,7 @@ final class FinderSync: FIFinderSync {
             while !Task.isCancelled {
                 let target = context.withLock { $0.target }
                 catalogClient.perform(ActionRequest(action: .catalog, target: target)) { response in
+                    canToggleHiddenFiles.withLock { $0 = response.canToggleHiddenFiles == true }
                     context.withLock { $0.gitTarget = response.gitRoot == nil ? nil : target }
                     applications.withLock { $0 = response.applications ?? [] }
                     recents.withLock { $0 = response.recentDestinations ?? [] }
@@ -126,6 +128,9 @@ final class FinderSync: FIFinderSync {
             move.submenu = choices
             menu.addItem(move)
         }
+        let hidden = item(ProductText.value("hiddenFiles"), value: "hidden:toggle", enabled: Self.canToggleHiddenFiles.withLock { $0 })
+        hidden.identifier = NSUserInterfaceItemIdentifier("hiddenFiles")
+        menu.addItem(hidden)
         guard preferences.showNew else { return menu }
         let names = snapshot.names
         if names.count == 1, let name = names.first {
@@ -199,6 +204,8 @@ final class FinderSync: FIFinderSync {
             request = ActionRequest(action: .moveTo, urls: selected)
         } else if value == "undo:" {
             request = ActionRequest(action: .undoMove)
+        } else if value == "hidden:toggle" {
+            request = ActionRequest(action: .toggleHiddenFiles)
         } else if value.hasPrefix("new:") {
             request = ActionRequest(action: .newFile, target: target, template: String(value.dropFirst(4)))
         } else { return }

@@ -57,3 +57,13 @@
 - Complete remaining acceptance checks for the initial public release, then add a Homebrew cask.
 
 Compilation, notarization and core tests do not replace installed UI or compatibility testing.
+
+## Hidden-file visibility
+
+- Added Show/Hide Hidden Files to Finder menus and Menu settings, using Finder's
+  native shortcut without restarting Finder or writing its preferences.
+- A neutral title avoids incorrectly representing transient Finder state.
+- Added localized permission handling and nine core command-contract checks.
+- Installed command delivery passed from Menu settings, blank-space and file context
+  menus, and the Finder toolbar. Finder kept PID 577 throughout.
+- The local signed/notarized build includes it; public v0.1.0 does not.

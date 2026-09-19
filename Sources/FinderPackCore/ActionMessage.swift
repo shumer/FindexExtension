@@ -1,6 +1,6 @@
 import Foundation
 
-public enum FileAction: String, Codable, Sendable { case copyPath, newFile, catalog, enableNotifications, openIn, moveTo, undoMove, cut, pasteFiles, pasteMove, moveHere }
+public enum FileAction: String, Codable, Sendable { case copyPath, newFile, catalog, enableNotifications, openIn, moveTo, undoMove, cut, pasteFiles, pasteMove, moveHere, toggleHiddenFiles }
 
 public struct ActionRequest: Codable, Sendable, Equatable {
     public let version: Int
@@ -36,6 +36,11 @@ public struct ActionRequest: Codable, Sendable, Equatable {
         guard value.urls.count <= 10_000, value.urls.allSatisfy(validURL),
               (value.target.map(validURL) ?? true), (value.destination.map(validURL) ?? true) else { throw MessageError.invalidContext }
         switch value.action {
+        case .toggleHiddenFiles:
+            guard value.urls.isEmpty, value.target == nil,
+                  value.style == nil, value.template == nil, value.application == nil, value.destination == nil else {
+                throw MessageError.invalidContext
+            }
         case .copyPath:
             guard !value.urls.isEmpty, value.style != nil, value.template == nil else {
                 throw MessageError.invalidContext
@@ -83,8 +88,9 @@ public struct ActionReply: Codable, Sendable {
     public let applications: [ApplicationChoice]?
     public let preferences: Preferences?
     public let templates: [String]
+    public let canToggleHiddenFiles: Bool?
 
-    public init(requestID: UUID, succeeded: Bool, message: String = "", templates: [String] = [], preferences: Preferences? = nil, gitRoot: URL? = nil, applications: [ApplicationChoice]? = nil, recentDestinations: [URL]? = nil) {
+    public init(requestID: UUID, succeeded: Bool, message: String = "", templates: [String] = [], preferences: Preferences? = nil, gitRoot: URL? = nil, applications: [ApplicationChoice]? = nil, recentDestinations: [URL]? = nil, canToggleHiddenFiles: Bool? = nil) {
         version = 2
         self.requestID = requestID
         self.succeeded = succeeded
@@ -94,5 +100,6 @@ public struct ActionReply: Codable, Sendable {
         self.gitRoot = gitRoot
         self.applications = applications
         self.recentDestinations = recentDestinations
+        self.canToggleHiddenFiles = canToggleHiddenFiles
     }
 }

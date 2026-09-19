@@ -269,3 +269,28 @@ try engine.undo(backupRecord)
 try expect(try String(contentsOf: replaceSource, encoding: .utf8) == "new", "Replacement undo restores incoming file")
 try expect(try String(contentsOf: replaceDestination, encoding: .utf8) == "old", "Replacement undo restores replaced file")
 print("Passed \(checks) total checks including occupied-path and replacement recovery.")
+
+
+let visibilityRequest = ActionRequest(action: .toggleHiddenFiles)
+try expect(try ActionRequest.decode(JSONEncoder().encode(visibilityRequest)) == visibilityRequest,
+           "Hidden-file command round trip preserves its receipt identity")
+for invalid in [
+    ActionRequest(action: .toggleHiddenFiles, urls: [file]),
+    ActionRequest(action: .toggleHiddenFiles, target: base),
+    ActionRequest(action: .toggleHiddenFiles, style: .posix),
+    ActionRequest(action: .toggleHiddenFiles, template: "Text.txt"),
+    ActionRequest(action: .toggleHiddenFiles, application: "com.apple.finder"),
+    ActionRequest(action: .toggleHiddenFiles, destination: base)
+] {
+    do {
+        _ = try ActionRequest.decode(JSONEncoder().encode(invalid))
+        try expect(false, "Reject file context on a fixed Finder shortcut command")
+    } catch MessageError.invalidContext { checks += 1 }
+}
+let oldReply = ActionReply(requestID: UUID(), succeeded: true)
+try expect(try JSONDecoder().decode(ActionReply.self, from: JSONEncoder().encode(oldReply)).canToggleHiddenFiles == nil,
+           "An older helper does not advertise the new command")
+let capableReply = ActionReply(requestID: UUID(), succeeded: true, canToggleHiddenFiles: true)
+try expect(try JSONDecoder().decode(ActionReply.self, from: JSONEncoder().encode(capableReply)).canToggleHiddenFiles == true,
+           "New helper advertises command support independently of Finder visibility")
+print("Passed \(checks) total checks including the Finder shortcut contract.")

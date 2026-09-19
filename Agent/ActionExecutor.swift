@@ -15,7 +15,7 @@ actor ActionExecutor {
             let store = TemplateStore(directory: root.appendingPathComponent("Templates", isDirectory: true))
             if request.action == .catalog {
                 try store.seed()
-                return ActionReply(requestID: request.id, succeeded: true, templates: Array(preferences.sorted(try store.catalog()).prefix(100)), preferences: preferences, gitRoot: request.target.flatMap(GitDiscovery.root), applications: await ApplicationActions.installed(), recentDestinations: MoveActions.recent())
+                return ActionReply(requestID: request.id, succeeded: true, templates: Array(preferences.sorted(try store.catalog()).prefix(100)), preferences: preferences, gitRoot: request.target.flatMap(GitDiscovery.root), applications: await ApplicationActions.installed(), recentDestinations: MoveActions.recent(), canToggleHiddenFiles: true)
             }
             if request.action == .enableNotifications {
                 let allowed = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound])
@@ -39,6 +39,9 @@ actor ActionExecutor {
                 return ActionReply(requestID: request.id, succeeded: false, message: ProductText.value("uncertain"))
             }
             switch request.action {
+            case .toggleHiddenFiles:
+                try await FinderVisibility.toggle()
+                return ActionReply(requestID: request.id, succeeded: true)
             case .copyPath:
                 guard let style = request.style else { throw MessageError.invalidContext }
                 let directory = style == .relative ? try request.target.map { try destination($0) } : nil
@@ -76,6 +79,9 @@ actor ActionExecutor {
             Logger(subsystem: "com.shumer.finderpack.agent", category: "Actions").error("File action failed: \(String(describing: error), privacy: .private)")
             if error is MoveError || [FileAction.moveTo, .undoMove, .pasteFiles, .pasteMove, .moveHere].contains(request.action) {
                 return ActionReply(requestID: request.id, succeeded: false, message: NSLocalizedString("Move stopped. Some files may already have moved. Existing data was kept. Check the destination and the move journal before retrying.", comment: ""))
+            }
+            if request.action == .toggleHiddenFiles {
+                return ActionReply(requestID: request.id, succeeded: false, message: error.localizedDescription)
             }
             if request.action == .openIn {
                 return ActionReply(requestID: request.id, succeeded: false, message: error.localizedDescription)

@@ -453,5 +453,15 @@
     "Применить ко всем конфликтам",
     "Застосувати до всіх конфліктів",
     "Zastosuj do wszystkich konfliktów"
+  ],
+  "Show/Hide Hidden Files": [
+    "Показать/скрыть скрытые файлы",
+    "Показати/сховати приховані файли",
+    "Pokaż/ukryj ukryte pliki"
+  ],
+  "Uses Finder's Show/Hide shortcut without restarting it. Accessibility permission is required.": [
+    "Переключает видимость штатной командой Finder без перезапуска. Требуется Универсальный доступ.",
+    "Перемикає видимість штатною командою Finder без перезапуску. Потрібен дозвіл Доступності.",
+    "Przełącza widoczność skrótem Findera bez ponownego uruchamiania. Wymagane uprawnienie Dostępność."
   ]
 }

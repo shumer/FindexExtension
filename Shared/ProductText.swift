@@ -6,6 +6,10 @@ enum ProductText {
         let language = Locale.preferredLanguages.first?.prefix(2) ?? "en"
         let index = ["en": 0, "ru": 1, "uk": 2, "pl": 3][String(language)] ?? 0
         let labels: [String: [String]] = [
+            "hiddenFiles": ["Show/Hide Hidden Files", "Показать/скрыть скрытые файлы", "Показати/сховати приховані файли", "Pokaż/ukryj ukryte pliki"],
+            "hiddenFinderUnavailable": ["Open Finder before changing hidden file visibility.", "Откройте Finder перед изменением видимости скрытых файлов.", "Відкрийте Finder перед зміною видимості прихованих файлів.", "Otwórz Finder przed zmianą widoczności ukrytych plików."],
+            "hiddenPermission": ["Allow FinderPackAgent in System Settings > Privacy & Security > Accessibility, then try again.", "Разрешите FinderPackAgent в Системных настройках > Конфиденциальность и безопасность > Универсальный доступ, затем повторите попытку.", "Дозвольте FinderPackAgent у Системних параметрах > Приватність і безпека > Доступність, потім повторіть спробу.", "Zezwól FinderPackAgent w Ustawieniach systemowych > Prywatność i ochrona > Dostępność, a następnie spróbuj ponownie."],
+            "hiddenFailed": ["Could not send the shortcut to Finder. Open a Finder window and try again.", "Не удалось отправить команду Finder. Откройте окно Finder и повторите попытку.", "Не вдалося надіслати команду Finder. Відкрийте вікно Finder і повторіть спробу.", "Nie udało się wysłać skrótu do Findera. Otwórz okno Findera i spróbuj ponownie."],
             "open": ["Open In", "Открыть в", "Відкрити у", "Otwórz w"],
             "gitRelative": ["Relative to Git Root", "Относительно корня Git", "Відносно кореня Git", "Względem katalogu Git"],
             "move": ["Move", "Переместить", "Перемістити", "Przenieś"],

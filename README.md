@@ -27,6 +27,11 @@ Clean-machine installation and broader runtime acceptance are still being tested
   Undo refuses to overwrite occupied paths or restore files changed after the operation.
 - **Settings:** native Menu, Templates, Applications, Shortcuts, Feedback and About sections.
   English, Russian, Ukrainian and Polish product strings are included.
+- **Hidden files:** Show/Hide Hidden Files in Finder menus and Menu settings sends
+  Finder's native Command-Shift-Period command without restarting Finder. The title
+  stays neutral because Finder does not expose a reliable live visibility state.
+  Allow FinderPackAgent in System Settings > Privacy & Security > Accessibility
+  on first use, then retry the command. This feature is newer than release v0.1.0.
 - **Shortcuts:** record combinations for copying a path and creating a file. No defaults.
   Finder-only registration is the default. Optional global shortcuts use the frontmost Finder window.
 

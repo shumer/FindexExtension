@@ -386,3 +386,30 @@ Downloaded the DMG anonymously from its public version-specific URL and confirme
 SHA-256 matches the verified CI asset. The public `releases/latest/download/appcast.xml`
 URL resolves successfully and advertises the expected version-specific build 8 ZIP.
 The local anonymous-download checks are in `build/public-release-check`.
+
+## Hidden-file command, 2026-09-19
+
+- A checked-state prototype failed acceptance: Finder's native shortcut changed the
+  visible test dotfile while AppleShowAllFiles remained absent. The final command
+  has a neutral Show/Hide Hidden Files title, no checkbox and no inferred state.
+- Nine core checks cover the new command contract, rejection of file/application
+  context, request identity and compatibility with older catalog replies.
+  All 73 core checks passed. Strict typechecking and the universal CLT build passed.
+- Local build 11 was signed, notarized and stapled, submission
+  `58512125-1efa-4428-8ade-08cd05d5f4ef`, status Accepted.
+- Accessibility permission failure showed a localized explanation in the earlier
+  installed prototype. The final installed helper used the permission already granted
+  by the user. No system permission was changed during this verification.
+- Sending the event without ensuring Finder was active did not change visibility.
+  The final helper activates Finder, waits for activation and sends a PID-targeted
+  Command-Shift-Period pair with a 40 ms interval after menu dismissal.
+- With `Visible.txt` and `.Hidden.txt` in an isolated fixture, Menu settings hid the
+  dotfile, the blank-space context menu revealed it, and the selected-file context
+  menu hid it again. The Finder toolbar command restored the initial visible state.
+- Finder retained PID 577 through installation and all toggles. The helper never
+  terminated Finder or wrote its visibility preference. Existing user data stayed
+  in the shared container; the previous app bundle remains backed up in
+  `build/hidden-files-acceptance/installed-before.zip`.
+- Runtime acceptance covers Apple Silicon on macOS 26.6.2 with the current keyboard
+  layout. Other supported OS versions/layouts still require acceptance checks.
+- This is a local installation; the public v0.1.0 assets remain unchanged.
