@@ -180,8 +180,8 @@ struct SettingsView: View {
             }
             HStack(alignment: .top, spacing: 16) {
                 VStack {
-                    List(model.templates, id: \.self, selection: Binding(get: { model.selected }, set: model.select)) { name in
-                        Text(model.preferences.templates[name]?.label.isEmpty == false ? model.preferences.templates[name]!.label : name)
+                    List(model.templates, id: \.self, selection: Binding(get: { model.selected }, set: { name in model.select(name) })) { name in
+                        Text(model.preferences.label(for: name))
                     }.frame(minWidth: 150, idealWidth: 170, maxWidth: 200)
                     HStack {
                         Button { model.reorder(-1) } label: { Image(systemName: "arrow.up") }.help("Move up")

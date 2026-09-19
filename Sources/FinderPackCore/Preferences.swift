@@ -89,6 +89,12 @@ public struct Preferences: Codable, Sendable, Equatable {
             return left == right ? $0.localizedStandardCompare($1) == .orderedAscending : left < right
         }
     }
+
+    public func label(for name: String) -> String {
+        if let label = templates[name]?.label, !label.isEmpty { return label }
+        if name.hasPrefix(".") { return name }
+        return (name as NSString).deletingPathExtension
+    }
 }
 
 public struct PreferencesStore: Sendable {

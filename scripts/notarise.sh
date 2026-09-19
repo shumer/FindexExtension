@@ -16,6 +16,10 @@ work="$(mktemp -d "$PWD/build/notary/submission.XXXXXX")"
 ditto -c -k --keepParent "$app_path" "$work/FinderPack.zip"
 xcrun notarytool submit "$work/FinderPack.zip" "${credentials[@]}" \
   --wait --output-format json > "$work/result.json" || true
+if [ ! -s "$work/result.json" ]; then
+  echo "Notarization returned no submission result. Check Keychain access and profile $profile." >&2
+  exit 1
+fi
 cat "$work/result.json"
 status="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("status", ""))' "$work/result.json")"
 identifier="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("id", ""))' "$work/result.json")"

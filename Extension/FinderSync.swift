@@ -98,6 +98,7 @@ final class FinderSync: FIFinderSync {
             choices.autoenablesItems = false
             open.identifier = NSUserInterfaceItemIdentifier("open")
             let applications = Self.applications.withLock { $0 }.filter { !preferences.disabledApplications.contains($0.identifier) }.sorted {
+                if $0.identifier == $1.identifier { return false }
                 if $0.identifier == preferences.preferredApplication { return true }
                 if $1.identifier == preferences.preferredApplication { return false }
                 return $0.name < $1.name
@@ -128,7 +129,8 @@ final class FinderSync: FIFinderSync {
         guard preferences.showNew else { return menu }
         let names = snapshot.names
         if names.count == 1, let name = names.first {
-            let entry = item(ProductText.value("new") + ": " + name, value: "new:" + name, enabled: target != nil)
+            let entry = item(ProductText.value("new") + ": " + preferences.label(for: name), value: "new:" + name, enabled: target != nil)
+            entry.image = NSImage(systemSymbolName: preferences.templates[name]?.symbol ?? "doc", accessibilityDescription: nil)
             entry.identifier = NSUserInterfaceItemIdentifier("new")
             menu.addItem(entry)
         } else {
@@ -140,7 +142,7 @@ final class FinderSync: FIFinderSync {
             } else {
                 for name in names {
                     let metadata = preferences.templates[name]
-                    let label = metadata?.label.isEmpty == false ? metadata!.label : name
+                    let label = preferences.label(for: name)
                     let entry = item(label, value: "new:" + name, enabled: target != nil)
                     entry.image = NSImage(systemSymbolName: metadata?.symbol ?? "doc", accessibilityDescription: nil)
                     choices.addItem(entry)
