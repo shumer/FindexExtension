@@ -65,6 +65,7 @@ if architecture not in ('arm64', 'x86_64'):
     raise SystemExit('Unsupported build architecture')
 architectures = ['arm64', 'x86_64'] if args.release else [architecture]
 number = capture('git', 'rev-list', '--count', 'HEAD')
+source_commit = capture('git', 'rev-parse', 'HEAD')
 work = root / '.build/clt'
 work.mkdir(parents=True, exist_ok=True)
 (root / '.build/module-cache').mkdir(exist_ok=True)
@@ -154,6 +155,7 @@ for kind, bundle in bundles.items():
     info['CFBundleSupportedPlatforms'] = ['MacOSX']
     info['NSHighResolutionCapable'] = True
     info['CFBundleLocalizations'] = ['en', 'ru', 'uk', 'pl']
+    info['FinderPackSourceCommit'] = source_commit
     if kind == 'App':
         public_key = os.environ.get('SPARKLE_PUBLIC_KEY', '')
         if public_key:

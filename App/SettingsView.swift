@@ -34,7 +34,7 @@ struct SettingsView: View {
             List(SettingsSection.allCases, selection: $navigation.section) { item in
                 Label(LocalizedStringKey(item.rawValue), systemImage: item.symbol).tag(item)
             }
-            .navigationSplitViewColumnWidth(min: 160, ideal: 180, max: 220)
+            .navigationSplitViewColumnWidth(min: 200, ideal: 220, max: 280)
         } detail: {
             VStack(alignment: .leading, spacing: 16) {
                 Text(LocalizedStringKey(section.rawValue)).font(.title2)
@@ -72,7 +72,7 @@ struct SettingsView: View {
                                              value: model.preferences.shortcuts.first { $0.action == action }, changed: { shortcut in
                                 model.preferences.shortcuts.removeAll { $0.action == action }
                                 if let shortcut { model.preferences.shortcuts.append(shortcut) }
-                            }, action: action).frame(width: 200, height: 28)
+                            }, action: action).frame(width: 240, height: 28)
                             Button("Clear") { model.preferences.shortcuts.removeAll { $0.action == action } }
                         }
                         Toggle("Use outside Finder", isOn: Binding(get: {
@@ -94,7 +94,7 @@ struct SettingsView: View {
             .padding(24)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
-        .frame(minWidth: 760, minHeight: 580)
+        .frame(minWidth: 800, minHeight: 580)
         .onChange(of: model.preferences) { _, _ in model.savePreferences() }
         .alert("FinderPack", isPresented: Binding(get: { model.failure != nil }, set: { if !$0 { model.failure = nil } })) {
             Button("OK") { model.failure = nil }

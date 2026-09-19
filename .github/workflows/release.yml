@@ -25,7 +25,7 @@ jobs:
       FINDERPACK_NOTARY_PROFILE: FinderPack-CI
       SPARKLE_PUBLIC_KEY: ${{ vars.SPARKLE_PUBLIC_KEY }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1.
         with:
           ref: ${{ inputs.tag }}
           fetch-depth: 0
@@ -89,7 +89,7 @@ jobs:
           gh release upload "$RELEASE_TAG" build/FinderPack-*.zip build/FinderPack-*.dmg build/SHA256SUMS build/build-info.json build/appcast.xml
       - name: Retain notarization evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1.
         with:
           name: notarization-evidence
           path: |

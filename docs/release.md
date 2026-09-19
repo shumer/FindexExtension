@@ -1,6 +1,6 @@
 # Release procedure
 
-Status: implemented local tooling and manual draft-release CI. GitHub signing secrets and the Sparkle public variable are not yet configured. No stable release has been published. The latest local build is signed but awaits notarization because profile FinderPack is currently unavailable.
+Status: implemented local tooling and manual draft-release CI. GitHub signing secrets and the Sparkle public variable are not yet configured. No stable release has been published. Local access to profile FinderPack is restored and the installed settings build has passed notarization.
 
 ## Prerequisites
 
@@ -131,7 +131,8 @@ export CODESIGN_IDENTITY='Developer ID Application: Your Name (TEAMID)'
 
 This creates `build/FinderPack-VERSION-BUILD.zip` and `.dmg`, notarizes/staples the DMG using
 profile `FinderPack`, then writes `SHA256SUMS` and `build-info.json`. Existing artifacts cause
-failure. The ZIP contains the stapled app and is the input to Sparkle signing. The appcast
+failure. Packaging rejects uncommitted tracked changes and a bundle whose recorded source
+commit, version or build does not match the current checkout. The ZIP contains the stapled app and is the input to Sparkle signing. The appcast
 uses the version-specific GitHub asset URL; clients obtain the feed from the latest stable
 release's `appcast.xml` asset.
 

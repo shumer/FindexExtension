@@ -3,6 +3,18 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 version="$(cat VERSION)"
 build_number="$(git rev-list --count HEAD)"
+: "${CODESIGN_IDENTITY:?Set the release signing identity}"
+git diff --quiet HEAD || { echo 'Commit tracked changes before packaging a release.' >&2; exit 1; }
+python3 - "$version" "$build_number" <<'PY'
+import plistlib
+import subprocess
+import sys
+from pathlib import Path
+info = plistlib.loads(Path('build/FinderPack.app/Contents/Info.plist').read_bytes())
+commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+if (info.get('CFBundleShortVersionString'), info.get('CFBundleVersion'), info.get('FinderPackSourceCommit')) != (sys.argv[1], sys.argv[2], commit):
+    raise SystemExit('The application does not match this commit/version/build. Rebuild and notarize it first.')
+PY
 archive="build/FinderPack-${version}-${build_number}.zip"
 image="build/FinderPack-${version}-${build_number}.dmg"
 if [ -e "$archive" ] || [ -e "$image" ]; then

@@ -205,3 +205,26 @@ final DMG. Do not distribute the latest local app as a notarized release.
 
 Outstanding external requirements: unlock the Mac for native UI checks, make the existing
 notarization profile available, and provision the GitHub release secrets/public update key.
+
+## Installed settings and file operations, 2026-09-19
+
+Keychain profile FinderPack became available again. Universal build 5 was accepted under
+submission `57899ea7-845a-4119-8650-d9e67edcbdfe`, stapled and accepted by Gatekeeper. The old
+helper was unregistered through its UI before replacing the app. The new app was installed
+in Applications, its helper connected, and the Finder extension stayed enabled without
+restarting Finder.
+
+Installed checks passed for the Russian settings sections, template content loading,
+application discovery, Finder's four menu groups and asynchronous Git-relative availability.
+Creating Markdown from Finder produced the expected expanded filename and selected the
+result. Move To opened a folder panel and moved the test file. Settings showed the journal
+entry; Undo restored the original path and exact content.
+
+A temporary shortcut could be recorded and cleared. System-wide invocation was not
+confirmed through the UI tool and remains a manual acceptance item. Opening Terminal was
+requested through Finder, but the tool prohibits inspecting Terminal, so its working
+folder is not counted as verified. All file operations used `build/runtime-0991939e` fixtures.
+
+Russian inspection exposed a truncated Shortcuts sidebar label. The sidebar and recorder
+were widened, with the final installed layout check recorded below when completed. CI
+Actions were updated to official v7.0.1 releases and pinned to their exact commit hashes.

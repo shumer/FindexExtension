@@ -13,7 +13,7 @@ jobs:
     runs-on: macos-26
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1.
       - name: Toolchain evidence
         run: |
           xcode-select -p
@@ -29,7 +29,7 @@ jobs:
     runs-on: macos-26
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1.
         with:
           fetch-depth: 0
       - name: Build and verify application with Command Line Tools
@@ -40,7 +40,7 @@ jobs:
       - name: Archive inspection bundle
         run: ditto -c -k --sequesterRsrc --keepParent build/FinderPack.app build/FinderPack-inspection.zip
       - name: Save inspectable build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1.
         with:
           name: FinderPack-inspection-only
           path: build/FinderPack-inspection.zip

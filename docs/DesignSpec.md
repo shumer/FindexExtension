@@ -33,7 +33,8 @@ Six sections: Menu, Templates, Applications, Shortcuts, Feedback and About.
 Use a 4 pt grid, 24 pt content inset, 12 pt row spacing and 16 pt template symbols.
 Body text uses the system 13 pt font, section headings 14 pt medium and window content
 headings 20 pt medium. Native control/window geometry takes precedence over mockup radii.
-Settings navigation starts at 180 pt and expands for localization.
+Settings navigation starts at 220 pt, with a 200 pt minimum and 280 pt maximum for localization.
+Installed Russian testing showed truncation at 180 pt; the main window now starts at 900 pt.
 
 Extension activation and background helper registration are separate setup steps.
 Automation and Accessibility are requested only when the corresponding feature needs them.
