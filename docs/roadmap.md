@@ -66,4 +66,5 @@ Compilation, notarization and core tests do not replace installed UI or compatib
 - Added localized permission handling and nine core command-contract checks.
 - Installed command delivery passed from Menu settings, blank-space and file context
   menus, and the Finder toolbar. Finder kept PID 577 throughout.
-- Included in the v0.1.1 release candidate; signed CI and publication are in progress.
+- Published in v0.1.1 build 13 after signed CI, independent asset verification and
+  a successful public Sparkle update from local build 11.

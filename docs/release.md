@@ -1,6 +1,11 @@
 # Release procedure
 
-Status: v0.1.0 build 8 was published on 2026-09-19 after successful signed CI, artifact verification and a local build 8-to-9 Sparkle lifecycle test. The public assets remain the immutable CI build 8 artifacts. The local installation was removed with user data retained so the owner can test a browser download and reinstall. Clean-machine and broader platform acceptance remain open. See `docs/verification.md` for evidence.
+Status: v0.1.1 build 13 was published on 2026-09-19 from commit
+`96e136cb11825f2a7b0f94a7f613476efaf85f7e`. Signed CI, independent asset verification,
+anonymous DMG/feed downloads and a real public Sparkle update from local build 11 to
+build 13 passed. The helper reconnected automatically and application data remained
+byte-identical. Published v0.1.0 build 8 assets remain unchanged. Clean-machine and
+broader platform acceptance remain open. See `docs/verification.md` for evidence.
 
 ## Prerequisites
 

@@ -413,3 +413,35 @@ The local anonymous-download checks are in `build/public-release-check`.
 - Runtime acceptance covers Apple Silicon on macOS 26.6.2 with the current keyboard
   layout. Other supported OS versions/layouts still require acceptance checks.
 - This is a local installation; the public v0.1.0 assets remain unchanged.
+
+## Public v0.1.1 release and update, 2026-09-19
+
+- Published stable v0.1.1 build 13 from commit
+  `96e136cb11825f2a7b0f94a7f613476efaf85f7e` at 11:15:06 UTC.
+- Source/build checks passed in run
+  https://github.com/shumer/FindexExtension/actions/runs/35439301493.
+- Signed release run passed:
+  https://github.com/shumer/FindexExtension/actions/runs/35439301373.
+  Swift 6.3.3, SDK 26.5, universal arm64/x86_64, minimum macOS 14.
+- App notarization `354789e8-f7e7-4512-99f0-9421fa904f2f` and DMG notarization
+  `189ee4a6-bc16-4011-8a78-d156299d186b` both returned Accepted.
+- Independently downloaded all five draft assets. Verified SHA-256 checksums,
+  archive EdDSA signature using the installed public key, exact version/build/commit,
+  architecture metadata, feed download URL/length and minimum OS.
+- App and DMG passed signature, staple and Gatekeeper checks. The mounted DMG app
+  matched the update ZIP file-for-file and symlink-for-symlink. Its Applications link
+  points to /Applications. Unmounted the verification image afterward.
+- After publication, anonymous downloads of the DMG and latest appcast matched the
+  verified draft bytes. Previous v0.1.0 assets were not replaced.
+- Used FinderPack's Check for Updates with its production GitHub feed, without a
+  feed override. Sparkle offered 0.1.1, downloaded it, installed and relaunched the app.
+  About displayed 0.1.1 (13). The installed app's stapled ticket validated.
+- Helper PID changed from 21492 to 24157 and the extension processes were replaced;
+  reconnection completed automatically and the reconnect marker was cleared.
+  Finder remained PID 577 throughout, including hidden-file toggles after updating.
+- Show/Hide Hidden Files hid and revealed the isolated test dotfile after the public
+  update. Initial visibility was restored. All 15 saved application data files,
+  excluding transient action receipts, remained byte-identical.
+- This verifies the local build 11-to-13 public update on Apple Silicon macOS 26.6.2.
+  The earlier build 8-to-9 lifecycle test is recorded above. Other Macs and macOS
+  versions remain part of the compatibility acceptance work.
