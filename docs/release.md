@@ -1,6 +1,6 @@
 # Release procedure
 
-Status: implemented local tooling and manual draft-release CI. GitHub signing secrets and the Sparkle public variable are not yet configured. No stable release has been published. Local build 6 and its DMG have passed notarization, stapling and Gatekeeper. The app is installed for acceptance testing.
+Status: signed-release CI passed for v0.1.0, build 8, on 2026-09-19. GitHub credentials and the Sparkle key pair were validated by the workflow. The draft contains a signed, notarized and stapled universal app and DMG, an EdDSA-signed update archive, checksums and build metadata. No stable release has been published. Installed build 6 remains the local acceptance-test version. See `docs/verification.md` for evidence and remaining acceptance checks.
 
 ## Prerequisites
 

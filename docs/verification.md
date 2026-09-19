@@ -294,3 +294,29 @@ The permission change passed 64 core checks, strict Swift typechecking and a uni
 Developer ID build. The rebuilt candidate is separate from installed build 6; delayed
 prompt behavior still needs a first-use check with that candidate. No stable release
 or production update key was created during these checks.
+
+
+## First signed GitHub release candidate, 2026-09-19
+
+[Release workflow 35436674999](https://github.com/shumer/FindexExtension/actions/runs/35436674999)
+completed successfully for tag `v0.1.0`, source `4979c710f27d0952d3a659fd7d79fb08a3391407`.
+Version 0.1.0, build 8, universal arm64/x86_64, Swift 6.3.3 and SDK 26.5.
+
+- All six environment secrets were present. Sparkle key-pair validation, certificate
+  import and Apple credential validation passed without exposing private values.
+- App notarization: `832d68d3-21d8-4660-86d0-93bd06d98c0a`, Accepted.
+- DMG notarization: `22e721d7-0406-48ea-9159-6603f8263d00`, Accepted.
+- Packaging, stapling, archive signing, feed generation and credential cleanup passed.
+- The unpublished draft contains `FinderPack-0.1.0-8.zip`, `FinderPack-0.1.0-8.dmg`,
+  `SHA256SUMS`, `build-info.json` and `appcast.xml`.
+- Downloaded all draft assets and notarization evidence into
+  `build/ci-release-35436674999`. Both archive checksums matched.
+- The extracted application passed strict nested signature verification and Gatekeeper
+  assessment as Notarized Developer ID. App and DMG stapled tickets validated locally.
+- Independently verified the downloaded ZIP's Ed25519 signature with CryptoKit against
+  the public key embedded in the app. The key, source commit, build number and feed
+  archive length matched the expected release metadata.
+
+The draft has not been published, and its feed is not yet publicly available. This run
+verifies the release pipeline, not installation or the two-version update lifecycle.
+Installed build 6 was not replaced during this run.
