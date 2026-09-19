@@ -17,7 +17,7 @@ as usual; open the FinderPack app when you want to change its settings.
 
 ![FinderPack settings showing path copying, file creation, moving and hidden-file commands](docs/images/menu-settings.png)
 
-*Screenshots show FinderPack with the English interface.*
+*Settings screenshots use English. The Finder context menu below is shown in Russian.*
 
 ## What can I do with it?
 
@@ -34,6 +34,11 @@ as usual; open the FinderPack app when you want to change its settings.
 Commands are available when right-clicking files, folders and empty space inside a
 Finder folder. Actions depend on the current selection and location. Finder's own
 **New Folder** command stays where it is; FinderPack adds file templates alongside it.
+
+<img src="docs/images/finder-context-menu.png" alt="Finder context menu in Russian showing FinderPack commands below Quick Actions" width="480">
+
+*FinderPack commands appear at the bottom of the menu: Copy Path, New File, Open In,
+Move and Show/Hide Hidden Files. This example uses a selected file in a demo folder.*
 
 ## Install and enable
 

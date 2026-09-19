@@ -524,3 +524,10 @@ The local anonymous-download checks are in `build/public-release-check`.
   byte-identical. Finder retained PID 577 throughout.
 - This verifies the local public update on Apple Silicon macOS 26.6.2. It does not
   replace the remaining Intel, other OS versions and clean-machine acceptance work.
+
+## Finder context-menu documentation, 2026-09-19
+
+- Added the maintainer-supplied FinderPackMenu.png as finder-context-menu.png, unchanged.
+  Visually checked that it shows a demo folder and the five FinderPack menu commands.
+- Added an English caption identifying the commands in the Russian Finder screenshot.
+  Settings screenshots remain English. This is documentation only; VERSION stays 0.1.2.

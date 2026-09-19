@@ -80,4 +80,4 @@ Compilation, notarization and core tests do not replace installed UI or compatib
 - Published v0.1.2 build 18 after signed CI, independent asset verification and a
   successful public Sparkle update from local build 14.
 - Reworked the README around installation and first use, with real interface screenshots,
-  separate usage/development guides and English screenshots.
+  separate usage/development guides, English settings screenshots and a Finder context-menu example.
