@@ -33,10 +33,13 @@
   sidebar arrow-key navigation and successful notification permission grant.
 - Opening the isolated text fixture through the Sublime Text adapter.
 - Separate notification setup connection with a five-minute permission wait and localized status.
-
 - Signed GitHub release workflow for v0.1.0 build 8, including credential validation,
   app/DMG notarization and a draft with all five assets. Downloaded archive signature,
   checksums, app signature and tickets independently verified.
+
+- Real Sparkle update from installed CI build 8 to notarized build 9 through a loopback
+  feed, with the helper and Finder extension active. Automatic reconnection, extension
+  replacement, data preservation and post-update file creation passed.
 
 ## Remaining acceptance gates
 
@@ -46,7 +49,8 @@
   Initial locale and light/dark spot checks passed; see verification evidence.
 - Check notification permission denial/delivery and shortcut Automation prompts.
 - Check macOS 14/15/26 and Intel runtime compatibility, cloud/network files and hotplug.
-- Exercise a real update between two installed versions with the active helper/extension.
+- Verify the published HTTPS feed and download path after release publication.
+  The installed two-build lifecycle has passed using a temporary loopback feed.
 - Complete quarantined-download, clean-machine installation and removal checks.
 - Publish a stable release and Homebrew cask after these gates pass.
 

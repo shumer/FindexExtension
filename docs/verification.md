@@ -320,3 +320,51 @@ Version 0.1.0, build 8, universal arm64/x86_64, Swift 6.3.3 and SDK 26.5.
 The draft has not been published, and its feed is not yet publicly available. This run
 verifies the release pipeline, not installation or the two-version update lifecycle.
 Installed build 6 was not replaced during this run.
+
+
+## Installed Sparkle lifecycle, 2026-09-19
+
+Installed CI build 8 from the downloaded, verified v0.1.0 draft. Before replacement,
+archived build 6 in `build/update-acceptance/installed-build6.zip`, disconnected its
+helper through Settings and quit the app. The previous bundle was retained at
+`/private/tmp/FinderPack-before-ci8-35436674999.app`. The shared application data backup
+completed after the user granted macOS container access, before the Sparkle upgrade.
+Build 8 connected its helper and passed the diagnostic/shared-container check. Its
+Finder extension created `Markdown.md` with the expected expanded content in the
+isolated `build/runtime-0991939e/Destination` fixture directory.
+
+Built version 0.1.0, build 9 from `dee7e6a993f99ad0c7eedd657ab7668088a208a0`, with the
+same production Sparkle public key, Developer ID team and bundle identifiers. This is
+a local test candidate, not a replacement for the immutable CI draft assets.
+
+- 64 core checks, source checks and universal CLT build passed with Swift 6.4/SDK 27.0.
+- Build 9 notarization `ab52aa2e-42bf-413d-b473-858a9e5ae842`: Accepted, stapled and
+  validated. Evidence: `build/notary/submission.k8wcf2`.
+- Created `build/update-acceptance/feed/FinderPack-0.1.0-9.zip` from the stapled app
+  and signed the archive using the existing FinderPack Ed25519 key.
+- Served only the fixture feed and archive on `127.0.0.1:8941`. Temporarily set the
+  documented Sparkle `SUFeedURL` user-default override for the installed app. Its
+  signed bundle and embedded production feed URL were not changed.
+- Build 8's standard Check for Updates UI offered build 9. Selected Install Update,
+  then Install and Relaunch. Sparkle downloaded, verified, extracted and installed
+  the update, and relaunched FinderPack showing `0.1.0 (9)`.
+- Helper PID changed from 6475 to 7786 and extension PID from 6402 to 7783. No manual
+  unregister/register or extension termination was performed during the 8-to-9
+  update. The reconnect marker was cleared, no Connect prompt appeared, and the
+  post-update diagnostic/shared-container check passed.
+- App, embedded agent and extension all report build 9. Installed app strict nested
+  signature verification, stapled-ticket validation and Gatekeeper assessment passed.
+- All 14 backed-up preference, recent-destination, template and recovery-journal files
+  matched byte for byte after the update. The updated extension created valid JSON
+  in the isolated fixture folder.
+- A second update check against the same local feed reported the application current.
+- Removed the temporary feed override, stopped the loopback server and relaunched
+  FinderPack. Build 9 remains installed with its original production feed configuration.
+
+The GitHub draft remains unpublished. This verifies the real Sparkle installation and
+helper/extension lifecycle on this Mac, but not public HTTPS delivery, clean-machine
+installation, Intel execution or other macOS versions. It does not replace the remaining
+accessibility, permission-denial and adapter acceptance checks.
+
+Sparkle documents the temporary feed override in its
+[updater API](https://sparkle-project.org/documentation/api-reference/Classes/SPUUpdater.html).
