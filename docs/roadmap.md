@@ -27,6 +27,8 @@
 - Strict typechecking of all three targets.
 - Universal Developer ID build and successful GitHub source/build jobs.
 - Sparkle appcast generation and independent ZIP signature verification with ephemeral keys.
+- Signed/notarized/stapled universal app and DMG, mounted image validation and checksums.
+- Installed Russian settings, template creation, Move To/undo, Cut/Paste and Move/undo.
 
 ## Remaining acceptance gates
 
@@ -35,7 +37,6 @@
 - Check keyboard navigation, VoiceOver, light/dark appearance and four locales.
 - Check notification permission denial/delivery and shortcut Automation prompts.
 - Check macOS 14/15/26 and Intel runtime compatibility, cloud/network files and hotplug.
-- Complete packaging and ticket checks for the final DMG.
 - Supply release environment secrets and the Sparkle public variable, then run signed CI.
 - Exercise a real update between two installed versions with the active helper/extension.
 - Complete quarantined-download, clean-machine installation and removal checks.

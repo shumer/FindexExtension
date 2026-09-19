@@ -2,6 +2,10 @@
 
 Date: 2026-09-19.
 
+Current status: universal build 6 is installed, and its app and DMG are notarized and
+stapled. See the final package section below. Earlier sections preserve historical results
+and blockers that may since have been resolved.
+
 ## Environment
 
 Active developer directory: `/Library/Developer/CommandLineTools`.
@@ -228,3 +232,28 @@ folder is not counted as verified. All file operations used `build/runtime-09919
 Russian inspection exposed a truncated Shortcuts sidebar label. The sidebar and recorder
 were widened, with the final installed layout check recorded below when completed. CI
 Actions were updated to official v7.0.1 releases and pinned to their exact commit hashes.
+
+## Final local package, build 6
+
+Source commit: `9c5b2b11cf73c44b9c80b5597af02a99bfee46fe`.
+Version 0.1.0, build 6, universal arm64/x86_64, Command Line Tools, Swift 6.4 and SDK 27.0.
+
+- App submission `34bfde5c-d473-414f-b38f-5c9f8a9c9c50`: Accepted.
+- DMG submission `11624070-9a3a-45e6-b6b8-99a37000f057`: Accepted.
+- Both tickets were stapled and validated; Gatekeeper accepted the app and DMG.
+- Mounted the DMG read-only and verified its embedded app ticket, Gatekeeper assessment,
+  matching bundle metadata and Applications symlink. Detached the image afterward.
+- SHA-256 checks passed for `build/FinderPack-0.1.0-6.zip` and `.dmg`.
+- Build evidence is in `build/build-info.json`; checksums are in `build/SHA256SUMS`.
+- Installed build 6 after unregistering the previous helper. Registration and the diagnostic
+  XPC/shared-container round trip passed again. Finder was not restarted.
+- The Russian Shortcuts sidebar label now fits. All sidebar section labels are visible.
+- Finder Cut, Paste and Move, and Undo Last Move passed on the isolated sample file with
+  exact content restored. The temporary recorded shortcut was cleared after testing.
+
+[GitHub Checks run 35424378724](https://github.com/shumer/FindexExtension/actions/runs/35424378724)
+passed with the pinned v7.0.1 Actions. These artifacts are local test candidates, not a
+published stable release. Remaining gates include the real two-version Sparkle lifecycle,
+system shortcut activation, permission-denial flows, additional locales/accessibility,
+third-party adapters and clean-machine/other-OS compatibility. GitHub release secrets and
+production update keys are still not configured.
