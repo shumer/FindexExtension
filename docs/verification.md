@@ -476,3 +476,14 @@ The local anonymous-download checks are in `build/public-release-check`.
   at runtime. Ordering and permission message validation have core coverage.
 - This is local acceptance of an unreleased change. Public v0.1.1 build 13 assets
   remain unchanged.
+
+## User documentation, 2026-09-19
+
+- Reworked the README for first-time users, with download, activation, first actions,
+  permissions, troubleshooting, updates and removal instructions.
+- Captured three unedited application-window screenshots from local build 14 in Russian.
+  Reviewed the images for readability and personal data before adding them to docs/images.
+  Captions distinguish development-only controls from the public v0.1.1 release.
+- Checked the public release tag and asset names through GitHub. Moved detailed template,
+  recovery and integration notes to usage.md and build/CI instructions to development.md.
+- Source/document link checks and all 101 core checks passed. No application code changed.

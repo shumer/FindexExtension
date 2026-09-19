@@ -78,3 +78,5 @@ Compilation, notarization and core tests do not replace installed UI or compatib
 - Installed acceptance passed for granular command/template visibility, pinned-folder
   moves and undo, and disconnected/connected setup status. User preferences restored.
 - Local build 14 is notarized and installed. These changes are not in a public release yet.
+- Reworked the README around installation and first use, with real interface screenshots,
+  release availability labels and separate usage/development guides.

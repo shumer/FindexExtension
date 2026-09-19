@@ -1,236 +1,185 @@
 # FinderPack
 
+**Create files, copy useful paths and move things faster, right from Finder.**
+
+FinderPack is a small macOS utility that adds commands to Finder's right-click menu.
+Create a Markdown note in the folder you are looking at, copy a path ready for Terminal,
+open a project in your editor, or move files to a recently used folder. Keep using Finder
+as usual; open the FinderPack app when you want to change its settings.
+
+[Download for macOS](https://github.com/shumer/FindexExtension/releases/latest) ·
+[Installation](#install-and-enable) · [First steps](#try-it-in-a-minute) ·
+[Report a problem](https://github.com/shumer/FindexExtension/issues)
+
 [![Checks](https://github.com/shumer/FindexExtension/actions/workflows/checks.yml/badge.svg)](https://github.com/shumer/FindexExtension/actions/workflows/checks.yml)
 
-FinderPack adds native commands to Finder for copying paths, creating files from templates,
-opening files in applications and moving files with recovery history.
+**macOS 14+ · Apple Silicon and Intel builds · English, Russian, Ukrainian and Polish**
 
-macOS 14 or later. Release builds contain Apple Silicon and Intel binaries. Runtime testing
-currently covers Apple Silicon on macOS 26.6.2; other supported systems still need acceptance
-checks. Download the latest signed version from [Releases](https://github.com/shumer/FindexExtension/releases/latest).
-Clean-machine installation and broader runtime acceptance are still being tested.
+![FinderPack settings showing path copying, file creation, moving and hidden-file commands](docs/images/menu-settings.png)
 
-## Features
+*Real screenshots from development build 14, using the Russian interface. The public
+release is currently v0.1.1 (build 13). Individual command hiding, Favorite Folders and
+Setup status are implemented on `main` and will arrive in a later release.*
 
-- **Copy Path:** absolute path, shell quoting, file URL, browsing-folder relative, Git-root
-  relative, home-relative, filename, filename without extension and parent folder.
-  Multiple results can use newlines, spaces or commas. Git-relative output appears after
-  the background cache discovers a repository.
-- **New File:** text and directory templates, numbered collision handling, custom menu
-  labels, symbols and ordering. Import files by dropping them into Templates or using Import.
-- **Open In:** installed terminal and editor choices. Paths are passed as data, never as
-  unescaped shell source. See the adapter verification notes below.
-- **Move:** choose a destination, reuse five recent folders, cut, paste a copy, paste and move,
-  or explicitly move copied files. Conflict choices include Keep Both, Skip and replacement
-  with a retained backup. Ordinary paste never removes its source.
-- **Recovery:** persisted move records, recent operations in Settings and conditional undo.
-  Undo refuses to overwrite occupied paths or restore files changed after the operation.
-- **Menu customization:** hide individual path formats, move commands, templates and the
-  hidden-file command. Empty groups disappear; hidden templates remain on disk.
-- **Favorite folders:** pin up to 20 move destinations, rename their menu labels and reorder
-  them. Favorites appear before recent folders without duplicate destinations.
-- **Setup status:** check extension activation, background approval, helper connectivity
-  and optional permissions. Buttons open the relevant settings or request access.
-- **Settings:** native Setup, Favorite Folders, Menu, Templates, Applications, Shortcuts,
-  Feedback and About sections.
-  English, Russian, Ukrainian and Polish product strings are included.
-- **Hidden files:** Show/Hide Hidden Files in Finder menus and Menu settings sends
-  Finder's native Command-Shift-Period command without restarting Finder. The title
-  stays neutral because Finder does not expose a reliable live visibility state.
-  Allow FinderPackAgent in System Settings > Privacy & Security > Accessibility
-  on first use, then retry the command. Available starting with v0.1.1.
-- **Shortcuts:** record combinations for copying a path and creating a file. No defaults.
-  Finder-only registration is the default. Optional global shortcuts use the frontmost Finder window.
+## What can I do with it?
 
-## Install
-
-### From a signed release
-
-When a release is available, download its DMG from [Releases](https://github.com/shumer/FindexExtension/releases).
-
-1. Open the DMG and drag FinderPack into Applications.
-2. Launch FinderPack from Applications, not from the disk image.
-3. Use **Open Extension Settings** and enable the FinderPack extension in macOS.
-4. Use **Connect** to register its background helper. Approve background operation if macOS asks.
-5. Open a new Finder context menu. Settings changes appear in new menus within five seconds.
-
-Release assets include SHA-256 checksums and `build-info.json`. Signed releases require both
-application and DMG notarization. Do not remove quarantine attributes or disable Gatekeeper.
-If macOS rejects an artifact, check its source and report the error.
-
-### Build locally
-
-Command Line Tools are sufficient; full Xcode and a generated Xcode project are not required.
-Python 3, Ruby and the system signing tools must be available. Builds download the pinned
-Sparkle archive and verify its SHA-256 digest before use.
-
-```sh
-xcode-select --install
-git clone https://github.com/shumer/FindexExtension.git
-cd FindexExtension
-./run-tests.sh
-./scripts/typecheck-app.sh
-./build.sh --release --no-install
-```
-
-A Developer ID Application identity with its private key must already be available in your
-Keychain. The build discovers it and derives the team identifier. To choose an identity,
-set `CODESIGN_IDENTITY` to its certificate name or SHA-1. No signing keys belong in the repo.
-
-Output: `build/FinderPack.app`. The release build assembles universal binaries, signs nested
-components first and verifies the complete bundle. It does not install or publish anything.
-
-Notarize with your existing Keychain profile:
-
-```sh
-./scripts/notarise.sh build/FinderPack.app FinderPack
-```
-
-Then copy the stapled app into Applications and follow the setup steps above. When replacing
-an installed development build, disconnect its helper in About before replacing the app,
-then reopen it and reconnect. Do not restart Finder automatically.
-
-For compilation and artifact inspection without signing credentials:
-
-```sh
-CODESIGN_IDENTITY=- ./build.sh --no-install
-```
-
-This ad-hoc build is not a distributable installation and cannot use the authenticated agent.
-
-## Templates
-
-Templates live in the resolved App Group container under `Library/Application Support/Templates`.
-Use **Templates > Reveal** to open that location. The app and helper share this single store.
-Changes made outside the app refresh asynchronously.
-
-The first launch seeds plain text, Markdown, PHP, JavaScript, TypeScript, JSON, shell,
-`.gitignore` and `.env`. Deleted templates are not recreated. Templates can contain:
-
-| Token | Value |
+| When you want to... | Use this Finder command |
 | --- | --- |
-| `{{date}}` | UTC date, YYYY-MM-DD |
-| `{{datetime}}` | ISO 8601 UTC timestamp |
-| `{{filename}}` | Actual reserved filename, including a collision number |
-| `{{author}}` | Configured author, or the macOS account display name |
-| `{{year}}` | Four-digit UTC year |
-| `{{uuid}}` | One UUID captured for the creation request |
+| Create a text file without opening an editor first | **New File** > Text, Markdown, JSON or another template |
+| Paste a filename or path into a message, script or Terminal | **Copy Path** > the format you need |
+| Open the current folder in a terminal or editor | **Open In** > an installed application |
+| Move files to another folder | **Move** > Choose Folder or a recent destination |
+| Cut files and move them somewhere else | **Move** > Cut, then **Paste and Move** in the destination |
+| Show dotfiles such as `.env` and `.gitignore` | **Show/Hide Hidden Files** |
+| Reverse a FinderPack move | **Move** > Undo Last Move, or find the operation in settings |
 
-UTF-8 and BOM-marked UTF-16 are supported. Binary content stays unchanged. Import preserves
-placeholders rather than expanding them. Regular template files are limited to 1 MiB.
-Directory templates are supported; symlinks inside them are rejected rather than followed.
-New files use default permissions subject to umask, retain template execute bits and clear
-inherited ACLs. Failed creation can leave a partial result; the error reports that possibility.
+Commands are available when right-clicking files, folders and empty space inside a
+Finder folder. Actions depend on the current selection and location. Finder's own
+**New Folder** command stays where it is; FinderPack adds file templates alongside it.
 
-The editor detects external content changes before saving. Reload or save the current
-text before switching templates with unsaved edits. Deletion moves a template to Trash.
+## Install and enable
 
-## File operations and recovery
+You do not need Xcode, Homebrew or a developer account to install a release.
 
-Same-volume moves use an exclusive rename. Cross-volume moves copy to staging, verify
-content, permissions, modification times, extended attributes and ACLs, then keep the original
-under a recovery name on its original volume. Symlinks move as links; packages remain one item.
+1. Open the [latest release](https://github.com/shumer/FindexExtension/releases/latest)
+   and download **`FinderPack-<version>-<build>.dmg`** from **Assets**.
+   Choose the DMG, not GitHub's Source code archive. The same download contains both
+   Apple Silicon and Intel binaries.
+2. Open the DMG and drag **FinderPack** to **Applications**.
+3. Launch **FinderPack from Applications**, then eject the disk image.
+4. Click **Open Extension Settings** and enable **FinderPack** in the macOS extension
+   settings that open. The location and wording vary by macOS version.
+5. Click **Connect** to enable the background helper. If macOS asks for background
+   approval, allow FinderPack and return to the app.
+6. Open a Finder folder and right-click an empty area. Look for **New File**,
+   **Copy Path**, **Open In** and **Move**. Close and reopen the menu after changing
+   settings; updates can take up to five seconds.
 
-Cross-volume filesystems that cannot preserve the verified metadata may reject a move. The
-source is retained. Cancellation stops at safe steps; a copy already in progress may need to
-finish before it can stop. A failed batch attempts to undo completed moves and retains its
-journal if recovery cannot complete.
+In v0.1.1, setup controls appear when the extension or helper needs attention.
+In the upcoming version, they have a dedicated **Setup** page, shown below.
 
-Recovery copies consume disk space. Recent operations offer Reveal and Undo Move. Retained
-copies are not silently purged. Before removing an old recovery copy yourself, verify the
-active file and any needed undo history. Undo is FinderPack's own operation, not Finder's
-Command-Z history. Disconnected volumes or external edits can prevent automatic recovery.
+Release downloads are Developer ID signed and notarized by Apple. If macOS reports
+that a download is damaged or cannot be verified, download it again from the release
+page and [report the exact message](https://github.com/shumer/FindexExtension/issues)
+if it persists. Do not disable Gatekeeper to install it.
 
-Cut intent is bound to the clipboard change count and is lost when another app changes the
-clipboard or the helper restarts. **Paste (Copy)** always copies. **Paste and Move** requires
-valid FinderPack cut intent. **Move Copied Files Here** is a separate explicit move command.
+## Try it in a minute
 
-## Applications, shortcuts and permissions
+1. **Make a note:** right-click empty space in a folder, then choose **New File > Markdown**.
+   FinderPack creates a file there. Existing files are preserved by choosing a numbered name.
+2. **Copy its name:** right-click the new file, then choose **Copy Path > Filename**.
+   Paste into a text field to see the result.
+3. **Move it:** choose **Move > Choose Folder**, pick a destination, then try
+   **Undo Last Move** to return it. Use a disposable file for your first test.
 
-Application adapters cover Terminal, iTerm2, Ghostty, Warp, Alacritty, kitty, WezTerm, Hyper,
-VS Code, Cursor, PhpStorm, WebStorm, Sublime Text, Zed and Neovim. Only detected choices appear.
-Neovim is detected at the standard Homebrew executable locations. Editors receive selected
-files; terminal actions use the selected directories or files' containing directories.
-Multiple distinct folders produce separate terminal launches.
+Copy Path also offers an absolute path, a shell-quoted path, a file URL, a path relative
+to the current folder, home or Git repository, a name without its extension and a parent
+folder. Git-relative output appears once the repository is detected.
 
-Third-party terminal adapters are implemented from their documented interfaces but still
-need runtime checks with those applications installed. See [verification](docs/verification.md).
+**Paste (Copy)** keeps the source. **Paste and Move** uses FinderPack's Cut command.
+**Move Copied Files Here** is a separate command that explicitly moves copied files.
 
-Finder extension activation and background helper registration are separate. Basic file
-creation and path copying do not need Automation or Accessibility. Finder shortcuts and
-scripted terminal adapters ask for Automation when used. Notification permission is optional;
-errors remain visible when success notifications are disabled. Automatic rename is not used.
-The notification request waits up to five minutes for the system prompt and uses a separate
-connection so other settings remain available. If no result arrives, check Notifications in
-System Settings; retrying file operations is not necessary.
+## Make it yours
 
-## Updates and removal
+### Keep the menu short
 
-Sparkle 2 is embedded for signed updates. An update-enabled build requires a matching EdDSA
-public key and signed appcast. Until the release key and feed are configured, **Check for
-Updates** explains that automatic updates are unavailable and links remain available in About.
-An update unregisters the helper before installation and reconnects it after relaunch.
-A real two-version update test remains a release gate.
+In **Menu**, choose which command groups appear and change their order. In
+**Applications**, hide editors or terminals you do not use. Only detected applications
+appear in Finder's Open In menu.
 
-To remove FinderPack, disconnect its helper in About, quit the app and move it from
-Applications to Trash. Your templates and recovery files stay in the App Group container.
-Review them before removing that container.
+**Coming in the next release:** expand the path or move options to hide individual
+commands. Hide a template from its editor without deleting the template file.
+These choices affect Finder menus; your recorded shortcuts keep working.
 
-## CI and releases
+### Create files from your own templates
 
-[Checks](https://github.com/shumer/FindexExtension/actions/workflows/checks.yml) runs on pushes
-to main and pull requests: source validation, core checks, strict Swift typechecking,
-separate-volume recovery tests and an inspectable ad-hoc bundle.
+Open **Templates**, choose an existing template and edit its contents, or use **Import**
+to add your own files. You can also drag files into the template list. Change each
+entry's menu label, icon and order to suit your work.
 
-[Signed release candidate](https://github.com/shumer/FindexExtension/actions/workflows/release.yml)
-is manually dispatched on main with an existing `vX.Y.Z` tag. It verifies the tag against
-VERSION and main history, enforces increasing build numbers, signs and notarizes the app,
-creates a signed/notarized DMG and ZIP, signs the update archive, generates its appcast and
-uploads immutable assets to a **draft** release. It never falls back to ad-hoc signing or
-replaces published assets. Secrets are removed in an always-running cleanup step.
+![Template editor with a Markdown template and a filename placeholder](docs/images/templates.png)
 
-Configure the repository's `release` environment with these secrets:
+*The Show template in Finder checkbox shown here is part of the upcoming release.*
 
-- `DEVELOPER_ID_P12`: base64 certificate and private key.
-- `DEVELOPER_ID_P12_PASSWORD`: exact P12 export password.
-- `NOTARY_KEY_P8`: base64 App Store Connect API private key.
-- `NOTARY_KEY_ID` and `NOTARY_ISSUER_ID`.
-- `SPARKLE_PRIVATE_KEY`: Sparkle EdDSA private key in its exported base64 format.
+Built-in templates include plain text, Markdown, JSON, JavaScript, TypeScript, PHP,
+shell, `.env` and `.gitignore`. Use `{{date}}`, `{{filename}}` or `{{author}}` in text
+for automatic substitutions. See [all template tokens and limits](docs/usage.md#templates).
 
-Set repository variable `SPARKLE_PUBLIC_KEY` to the matching public key. The workflow checks
-that the update keys match before importing the release certificate. See [release setup](docs/release.md)
-for key handling, publication order and recovery. This repository currently has no signing
-secrets configured; a signed GitHub release cannot run until they are supplied.
+### Pin folders you move to often
 
-## Development documents
+**Coming in the next release:** open **Favorite Folders > Add Folders**, select your
+usual destinations, then give them short labels and arrange them with the arrows.
+Up to 20 favorites appear before the five recent destinations in the Move menu.
 
-- [Selected design](docs/DesignSpec.md)
-- [Product specification](docs/Specification.md)
-- [Architecture](docs/architecture.md)
-- [Verification and limitations](docs/verification.md)
-- [Roadmap](docs/roadmap.md)
-- [Repository rules](CLAUDE.md)
+Removing a pin does not delete the folder. If a destination is missing or offline,
+the move stops. Re-add a favorite after moving or renaming its folder.
 
-Before a commit, run `./run-tests.sh` and `./scripts/check-source.sh`. For application changes,
-also run `./build.sh`. Use `./scripts/check-cross-volume.sh` for the separate-volume fixture.
-Do not equate compilation or notarization with UI, update or compatibility acceptance.
+### See what still needs setup
 
-## Customize menus and pinned folders
+**Coming in the next release:** **Setup** checks the Finder extension, background helper
+connection and optional permissions. If something needs attention, use the button
+beside it to connect the helper or open the relevant macOS settings.
 
-In Menu, expand Path commands or Move commands to choose individual entries. Templates
-has a Show template in Finder control; Applications already has per-application controls.
-Group visibility and ordering still apply. These changes only affect Finder menus, not
-recorded shortcuts. New menus refresh within five seconds.
+![Setup page showing an enabled extension, a responding helper and optional permissions](docs/images/setup.png)
 
-In Favorite Folders, use Add Folders, optionally enter a short menu label, and use the
-arrows to reorder entries. Remove Pin never deletes the folder. If a destination is
-missing or offline, the move fails without redirecting files somewhere else. Re-add a
-folder if it has moved or been renamed.
+Opening this page checks status without requesting new permissions.
 
-Setup separates the extension, background registration and an actual helper response.
-Permissions listed there belong to FinderPackAgent. Opening the page does not request
-access. Grant optional Accessibility for hidden-file switching, Automation for Finder
-shortcuts, and notifications for success messages only when needed. Status refreshes
-while the page is open and when returning from System Settings.
+| Permission | What it enables | Needed for basic file commands? |
+| --- | --- | --- |
+| Finder extension and background helper | Finder menus and command execution | Yes |
+| Accessibility for FinderPackAgent | Show/Hide Hidden Files using Finder's native shortcut | No |
+| Automation for Finder | Reading the Finder selection for recorded shortcuts | No |
+| Automation for some terminal apps | Opening a location through their integration | No |
+| Notifications | Success messages | No |
 
-These customization and setup improvements are newer than public v0.1.1.
+Grant optional permissions when you use the corresponding feature. Hidden-file switching
+uses Finder's native shortcut without restarting Finder. Errors remain visible even if
+you disable success notifications.
+
+## Questions and fixes
+
+**I installed it, but the menu is missing.** Open FinderPack from Applications, check
+that the extension is enabled and the helper is connected, then close and reopen the
+Finder context menu. Check that the relevant group is enabled in Menu settings.
+
+**Show/Hide Hidden Files does nothing.** Allow **FinderPackAgent** in **System Settings >
+Privacy & Security > Accessibility**, then retry. It is a toggle, so its title does not
+claim whether hidden files are currently visible.
+
+**Why is my terminal or editor missing?** Open In lists supported applications that are
+installed and enabled in settings. See the [supported integrations](docs/usage.md#applications-shortcuts-and-permissions).
+Third-party terminal integrations still need broader runtime testing.
+
+**How does undo work?** FinderPack keeps its own move history. Use its Undo command,
+not Finder's Command-Z. It will not overwrite an occupied original path or silently
+restore a file that has changed. Recovery copies can use disk space and are not
+silently deleted. See [file operations and recovery](docs/usage.md#file-operations-and-recovery).
+
+**How do I update?** Open **About > Check for Updates**. Signed releases use Sparkle
+to download and install updates. The helper reconnects after relaunch. You can also
+download the latest DMG manually.
+
+**How do I uninstall?** In **About**, click **Disconnect Helper**, quit FinderPack,
+then move the app from Applications to Trash. Templates and recovery files remain
+in its shared container; review them before deleting that data.
+
+## Compatibility and project status
+
+FinderPack is an early release. Builds target macOS 14 and later and contain both
+Apple Silicon and Intel binaries. Installed runtime checks currently cover Apple
+Silicon on macOS 26.6.2, including file creation, move/undo, hidden-file switching and
+a public Sparkle update. Other macOS versions, Intel, cloud/network locations and
+clean-machine installation still need broader verification.
+
+See [tested behavior and known limits](docs/verification.md) and the [roadmap](docs/roadmap.md).
+When reporting a problem, include your macOS version, FinderPack version and steps to
+reproduce it. Remove personal paths and file contents from logs or screenshots.
+
+## For contributors
+
+- [Build locally with Command Line Tools](docs/development.md). Full Xcode is not required.
+- [Detailed usage and recovery behavior](docs/usage.md).
+- [Architecture](docs/architecture.md), [product specification](docs/Specification.md)
+  and [selected design](docs/DesignSpec.md).
+- [Signing, CI and release setup](docs/release.md).
+- [Repository rules](CLAUDE.md).
