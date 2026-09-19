@@ -487,3 +487,10 @@ The local anonymous-download checks are in `build/public-release-check`.
 - Checked the public release tag and asset names through GitHub. Moved detailed template,
   recovery and integration notes to usage.md and build/CI instructions to development.md.
 - Source/document link checks and all 101 core checks passed. No application code changed.
+
+## English README screenshots, 2026-09-19
+
+- Recaptured Menu, Templates and Setup in the installed app with a temporary per-app
+  English language override. All three images were visually checked before replacement.
+- Updated captions and screenshot guidance to require English for the README. Removed
+  the temporary override after capture; the system language was never changed.

@@ -17,7 +17,7 @@ as usual; open the FinderPack app when you want to change its settings.
 
 ![FinderPack settings showing path copying, file creation, moving and hidden-file commands](docs/images/menu-settings.png)
 
-*Real screenshots from development build 14, using the Russian interface. The public
+*Real screenshots from development build 14, using the English interface. The public
 release is currently v0.1.1 (build 13). Individual command hiding, Favorite Folders and
 Setup status are implemented on `main` and will arrive in a later release.*
 
