@@ -1,11 +1,12 @@
 # Release procedure
 
-Status: v0.1.1 build 13 was published on 2026-09-19 from commit
-`96e136cb11825f2a7b0f94a7f613476efaf85f7e`. Signed CI, independent asset verification,
-anonymous DMG/feed downloads and a real public Sparkle update from local build 11 to
-build 13 passed. The helper reconnected automatically and application data remained
-byte-identical. Published v0.1.0 build 8 assets remain unchanged. Clean-machine and
-broader platform acceptance remain open. See `docs/verification.md` for evidence.
+Status: v0.1.2 build 18 was published on 2026-09-19 from commit
+`2ef2ef305ca4abeef2832dc12083d2d406a9528d`. Signed CI, independent asset verification,
+anonymous DMG/feed downloads and a real public Sparkle update from local build 14 to
+build 18 passed. The helper reconnected automatically and all 16 saved application
+data files remained byte-identical. Previous public release assets remain unchanged.
+Clean-machine and broader platform acceptance remain open. See `docs/verification.md`
+for evidence.
 
 ## Prerequisites
 

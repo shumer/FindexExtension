@@ -77,6 +77,7 @@ Compilation, notarization and core tests do not replace installed UI or compatib
 - All 101 core checks and the signed universal CLT build passed.
 - Installed acceptance passed for granular command/template visibility, pinned-folder
   moves and undo, and disconnected/connected setup status. User preferences restored.
-- Local build 14 is notarized and installed. Release 0.1.2 packages these improvements.
+- Published v0.1.2 build 18 after signed CI, independent asset verification and a
+  successful public Sparkle update from local build 14.
 - Reworked the README around installation and first use, with real interface screenshots,
   separate usage/development guides and English screenshots.

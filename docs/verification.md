@@ -494,3 +494,33 @@ The local anonymous-download checks are in `build/public-release-check`.
   English language override. All three images were visually checked before replacement.
 - Updated captions and screenshot guidance to require English for the README. Removed
   the temporary override after capture; the system language was never changed.
+
+## Public v0.1.2 release and update, 2026-09-19
+
+- Published stable v0.1.2 build 18 from commit
+  `2ef2ef305ca4abeef2832dc12083d2d406a9528d` at 12:03:56 UTC.
+- Source/build checks passed in run
+  https://github.com/shumer/FindexExtension/actions/runs/35441523767.
+  All 101 core checks passed locally and release source typechecking passed in CI.
+- Signed release run passed:
+  https://github.com/shumer/FindexExtension/actions/runs/35441523829.
+  Swift 6.3.3, SDK 26.5, universal arm64/x86_64, minimum macOS 14.
+- App notarization `d3be0f28-7a53-41a7-aab3-dfc3d49f7019` and DMG notarization
+  `64338580-4bcf-443c-bbbc-b6dd32eca0ca` both returned Accepted.
+- Independently downloaded all five draft assets. Verified SHA-256 checksums,
+  archive EdDSA signature against the existing public key, exact version/build/commit,
+  architectures, appcast URL/length and minimum OS. App and DMG signature/ticket
+  checks passed, and Gatekeeper accepted the app as Notarized Developer ID.
+- Mounted the DMG read-only and compared its app file/symlink manifest with the ZIP.
+  Contents matched, the Applications link was correct, and the image was unmounted.
+- Published the verified draft as latest stable. Anonymous downloads of its DMG and
+  latest appcast matched the verified bytes. Previous release assets were not replaced.
+- About > Check for Updates offered 0.1.2 through the production feed. Sparkle
+  downloaded, installed and relaunched the app from local build 14 to public build 18.
+  Installed version metadata and the stapled ticket were verified.
+- Setup showed the extension enabled and helper responding without another Connect
+  action. Existing Accessibility and notification permissions remained available.
+  All 16 saved application data files, excluding transient action receipts, stayed
+  byte-identical. Finder retained PID 577 throughout.
+- This verifies the local public update on Apple Silicon macOS 26.6.2. It does not
+  replace the remaining Intel, other OS versions and clean-machine acceptance work.
