@@ -18,6 +18,8 @@ for path in root.rglob('*'):
     if path.suffix not in {'.md', '.swift', '.sh', '.py', '.yml', '.json', '.plist', '.entitlements'}:
         continue
     text = path.read_text()
+    if path.suffix == '.py':
+        compile(text, str(path), 'exec')
     count += 1
     for number, line in enumerate(text.splitlines(), 1):
         if re.search(r'[\u2010-\u2015]', line):

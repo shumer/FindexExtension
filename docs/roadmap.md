@@ -1,56 +1,42 @@
 # Roadmap
 
-## Implemented foundation
+## Implemented
 
-- Repository rules, revised product scope, architecture decision and release procedure.
-- Explicit runtime checklist covering the twenty original edge cases.
-- Pure Swift path formatter and bounded, versioned diagnostic messages with core checks.
-- CLT build for app, extension, agent and shared static module; explicit extension entry point.
-- Diagnostic UI, service registration controls, asynchronous XPC ping with timeout and
-  bidirectional signature requirements. App and Finder diagnostic requests pass on the installed macOS 26.6.2 prototype.
-- Local build/typecheck/source-check entry points and source and ad-hoc-build CI definition.
+- Command Line Tools build, Swift 6 strict concurrency and authenticated asynchronous XPC.
+- Developer ID signing, local notarization and stapling of the app.
+- Selected native design A with direct Finder menu groups.
+- Nine path formats, configurable separators and cached Git discovery.
+- Shared preferences and template catalog with one-time default seeding.
+- File and directory templates, UTF-8/UTF-16 placeholder expansion, exclusive creation,
+  custom labels/icons/order, import, editor and Trash removal.
+- Installed application discovery, terminal/editor adapters and explicit permission controls.
+- Move/copy journal, verified cross-volume copying, retained originals, conflict choices,
+  progress/cancellation, clipboard intent, recent destinations and conditional batch undo.
+- Native settings, optional shortcuts and product strings in four languages.
+- Pinned Sparkle framework, update key validation and signed appcast generation scripts.
+- Source/build CI and a fail-closed, manual signed-release workflow that creates a draft.
+- README with installation, development, recovery and release setup instructions.
 
-## Next gate: signed prototype
+## Verification completed
 
-- [ ] Confirm final product name, bundle prefix and developer team.
-- [x] Compile, assemble and verify all three bundles with Command Line Tools.
-- [x] Validate nested bundle layout, signed entitlements and installed diagnostic behavior.
-- [ ] Install and verify the prototype checklist on a real Finder session.
-- [ ] Verify monitoring coverage, XPC authentication and service lifecycle.
-- [x] Complete Developer ID/notarization/stapling and installed Gatekeeper validation.
-- [x] Verify shared storage and rejection of an unrelated signed client.
-- [x] Verify container, sidebar and external USB menu entry points.
+- Installed app/agent/extension XPC round trips and rejection of an unrelated signed client.
+- Finder toolbar, item, container, sidebar and external USB menu entry points.
+- Installed path copying and regular template creation with numbered collisions.
+- 70 core checks including a separate mounted APFS volume, ACL/xattr preservation,
+  unchanged-source copying, move/undo, cancellation and interrupted journal recovery.
+- Strict typechecking of all three targets.
 
-## Design
+## Remaining acceptance gates
 
-- [x] Prepare three interactive light/dark concepts; see [design concepts](design-concepts.md).
-- [x] Record owner selection A and write [DesignSpec](DesignSpec.md) with proposed native UI tokens.
-- [ ] Measure production settings UI and complete accessibility review.
+- Install the latest settings/operations build and check Finder actions end to end.
+  The current Mac session is locked; the installed app is the earlier action prototype.
+- Verify third-party terminal adapters with their applications installed.
+- Check keyboard navigation, VoiceOver, light/dark appearance and four locales.
+- Check notification permission denial/delivery and shortcut Automation prompts.
+- Check macOS 14/15/26 and Intel runtime compatibility, cloud/network files and hotplug.
+- Supply release environment secrets and the Sparkle public variable, then run signed CI.
+- Exercise a real update between two installed versions with the active helper/extension.
+- Complete quarantined-download, clean-machine installation and removal checks.
+- Publish a stable release and Homebrew cask after these gates pass.
 
-## Core product
-
-- [x] Implement eight copy formats through authenticated XPC with newline-separated results.
-- [x] Add cached regular-file template menus, one-time seeding and exclusive numbered creation.
-- [x] Localize action labels/errors in English, Russian, Ukrainian and Polish.
-- [ ] Complete template trees, alternate text encodings, custom labels/icons and settings.
-- [ ] Verify inherited ACL policy, interrupted writes and bounded request-receipt retention.
-- [ ] Complete notification permission UX and verify notification delivery in each supported OS.
-
-
-- [ ] Complete path formatting acceptance matrix and cached git discovery.
-- [ ] Shared preferences, atomic template catalog, seeding and safe file creation.
-- [ ] Application discovery/adapters and feature-scoped permissions.
-- [ ] Settings, template editor and production onboarding.
-- [ ] Move journal, conflict UI, verified cross-volume copy, undo/cancellation/recovery.
-- [ ] Shortcut integration, feedback, four locales and accessibility.
-
-## Distribution
-
-- [ ] Pin release toolchain/dependencies and confirm supported CPU architectures.
-- [ ] Add fail-closed release CI, nested signing, DMG and notarization.
-- [ ] Add Sparkle, EdDSA secret/public key, appcast hosting and immutable publication.
-- [ ] Exercise updating two installed versions with active agent/extension.
-- [ ] Complete clean-machine, OS compatibility and removal checks.
-- [ ] Publish stable release and Homebrew cask.
-
-A Developer ID prototype has been built, installed and tested. The prototype is notarized and stapled. No public release has been published.
+Compilation, notarization and core tests do not replace installed UI or compatibility testing.

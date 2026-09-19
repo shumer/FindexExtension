@@ -6,6 +6,15 @@ enum ProductText {
         let language = Locale.preferredLanguages.first?.prefix(2) ?? "en"
         let index = ["en": 0, "ru": 1, "uk": 2, "pl": 3][String(language)] ?? 0
         let labels: [String: [String]] = [
+            "open": ["Open In", "Открыть в", "Відкрити у", "Otwórz w"],
+            "gitRelative": ["Relative to Git Root", "Относительно корня Git", "Відносно кореня Git", "Względem katalogu Git"],
+            "move": ["Move", "Переместить", "Перемістити", "Przenieś"],
+            "chooseDestination": ["Choose Destination...", "Выбрать папку...", "Вибрати теку...", "Wybierz folder..."],
+            "undoMove": ["Undo Last Move", "Вернуть последнее перемещение", "Скасувати останнє переміщення", "Cofnij ostatnie przeniesienie"],
+            "cut": ["Cut", "Вырезать", "Вирізати", "Wytnij"],
+            "pasteFiles": ["Paste (Copy)", "Вставить (копировать)", "Вставити (копіювати)", "Wklej (kopiuj)"],
+            "pasteMove": ["Paste and Move", "Вставить и переместить", "Вставити й перемістити", "Wklej i przenieś"],
+            "moveHere": ["Move Copied Files Here", "Переместить скопированные файлы сюда", "Перемістити скопійовані файли сюди", "Przenieś skopiowane pliki tutaj"],
             "copy": ["Copy Path", "Копировать путь", "Копіювати шлях", "Kopiuj ścieżkę"],
             "new": ["New File", "Новый файл", "Новий файл", "Nowy plik"],
             "posix": ["Absolute Path", "Абсолютный путь", "Абсолютний шлях", "Ścieżka bezwzględna"],

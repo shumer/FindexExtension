@@ -32,7 +32,7 @@ final class ActionClient {
             }
             connection.resume()
             timeout = Task { [weak self] in
-                do { try await Task.sleep(for: .seconds(15)) } catch { return }
+                do { try await Task.sleep(for: .seconds([FileAction.moveTo, .undoMove, .pasteFiles, .pasteMove, .moveHere].contains(request.action) ? 86_400 : 15)) } catch { return }
                 self?.finish(failure)
             }
             let proxy = connection.remoteObjectProxyWithErrorHandler { @Sendable [weak self] _ in
@@ -43,7 +43,7 @@ final class ActionClient {
                 var result = failure
                 if let data, data.count <= 1_048_576,
                    let decoded = try? JSONDecoder().decode(ActionReply.self, from: data),
-                   decoded.version == 1, decoded.requestID == request.id {
+                   decoded.version == 2, decoded.requestID == request.id {
                     result = decoded
                 }
                 let response = result

@@ -1,0 +1,457 @@
+{
+  "Menu": [
+    "Меню",
+    "Меню",
+    "Menu"
+  ],
+  "Templates": [
+    "Шаблоны",
+    "Шаблони",
+    "Szablony"
+  ],
+  "Applications": [
+    "Приложения",
+    "Програми",
+    "Aplikacje"
+  ],
+  "Shortcuts": [
+    "Горячие клавиши",
+    "Сполучення клавіш",
+    "Skróty"
+  ],
+  "Feedback": [
+    "Уведомления",
+    "Сповіщення",
+    "Powiadomienia"
+  ],
+  "About": [
+    "О приложении",
+    "Про програму",
+    "O aplikacji"
+  ],
+  "Copy Path": [
+    "Копировать путь",
+    "Копіювати шлях",
+    "Kopiuj ścieżkę"
+  ],
+  "New File": [
+    "Новый файл",
+    "Новий файл",
+    "Nowy plik"
+  ],
+  "Open In": [
+    "Открыть в",
+    "Відкрити у",
+    "Otwórz w"
+  ],
+  "Move": [
+    "Переместить",
+    "Перемістити",
+    "Przenieś"
+  ],
+  "First path format": [
+    "Первый формат пути",
+    "Перший формат шляху",
+    "Pierwszy format ścieżki"
+  ],
+  "Multiple paths": [
+    "Несколько путей",
+    "Кілька шляхів",
+    "Wiele ścieżek"
+  ],
+  "One per line": [
+    "По одному в строке",
+    "По одному в рядку",
+    "Jeden w wierszu"
+  ],
+  "Space separated": [
+    "Через пробел",
+    "Через пробіл",
+    "Oddzielone spacją"
+  ],
+  "Comma separated": [
+    "Через запятую",
+    "Через кому",
+    "Oddzielone przecinkiem"
+  ],
+  "Changes apply to new Finder menus within five seconds.": [
+    "Изменения появятся в новых меню Finder в течение пяти секунд.",
+    "Зміни з’являться в нових меню Finder протягом п’яти секунд.",
+    "Zmiany pojawią się w nowych menu Findera w ciągu pięciu sekund."
+  ],
+  "Extension enabled": [
+    "Расширение включено",
+    "Розширення ввімкнено",
+    "Rozszerzenie włączone"
+  ],
+  "Enable the Finder extension": [
+    "Включите расширение Finder",
+    "Увімкніть розширення Finder",
+    "Włącz rozszerzenie Findera"
+  ],
+  "Open Extension Settings": [
+    "Настройки расширений",
+    "Налаштування розширень",
+    "Ustawienia rozszerzeń"
+  ],
+  "Background helper connected": [
+    "Фоновый помощник подключен",
+    "Фоновий помічник підключений",
+    "Pomocnik w tle połączony"
+  ],
+  "Connect the background helper": [
+    "Подключите фонового помощника",
+    "Підключіть фонового помічника",
+    "Połącz pomocnika w tle"
+  ],
+  "Connect": [
+    "Подключить",
+    "Підключити",
+    "Połącz"
+  ],
+  "Background Settings": [
+    "Настройки фоновой работы",
+    "Налаштування фонової роботи",
+    "Ustawienia pracy w tle"
+  ],
+  "New": [
+    "Создать",
+    "Створити",
+    "Nowy"
+  ],
+  "Import": [
+    "Импорт",
+    "Імпорт",
+    "Importuj"
+  ],
+  "Reveal": [
+    "Показать в Finder",
+    "Показати у Finder",
+    "Pokaż w Finderze"
+  ],
+  "Reload": [
+    "Перезагрузить",
+    "Перезавантажити",
+    "Wczytaj ponownie"
+  ],
+  "Move template to Trash": [
+    "Переместить шаблон в Корзину",
+    "Перемістити шаблон у Смітник",
+    "Przenieś szablon do Kosza"
+  ],
+  "Move template to Trash?": [
+    "Переместить шаблон в Корзину?",
+    "Перемістити шаблон у Смітник?",
+    "Przenieść szablon do Kosza?"
+  ],
+  "Move to Trash": [
+    "В Корзину",
+    "У Смітник",
+    "Do Kosza"
+  ],
+  "Move up": [
+    "Выше",
+    "Вище",
+    "W górę"
+  ],
+  "Move down": [
+    "Ниже",
+    "Нижче",
+    "W dół"
+  ],
+  "Menu label": [
+    "Название в меню",
+    "Назва в меню",
+    "Nazwa w menu"
+  ],
+  "Symbol": [
+    "Значок",
+    "Значок",
+    "Symbol"
+  ],
+  "Template content": [
+    "Содержимое шаблона",
+    "Вміст шаблону",
+    "Treść szablonu"
+  ],
+  "Save Content": [
+    "Сохранить текст",
+    "Зберегти текст",
+    "Zapisz treść"
+  ],
+  "Select a template to edit.": [
+    "Выберите шаблон для редактирования.",
+    "Виберіть шаблон для редагування.",
+    "Wybierz szablon do edycji."
+  ],
+  "Author for templates": [
+    "Автор для шаблонов",
+    "Автор для шаблонів",
+    "Autor szablonów"
+  ],
+  "Placeholders: {{date}}, {{datetime}}, {{filename}}, {{author}}, {{year}}, {{uuid}}": [
+    "Подстановки: {{date}}, {{datetime}}, {{filename}}, {{author}}, {{year}}, {{uuid}}",
+    "Підстановки: {{date}}, {{datetime}}, {{filename}}, {{author}}, {{year}}, {{uuid}}",
+    "Zmienne: {{date}}, {{datetime}}, {{filename}}, {{author}}, {{year}}, {{uuid}}"
+  ],
+  "Saved": [
+    "Сохранено",
+    "Збережено",
+    "Zapisano"
+  ],
+  "Binary template. Use Reveal to edit externally.": [
+    "Бинарный шаблон. Откройте его через Finder для редактирования.",
+    "Бінарний шаблон. Відкрийте його через Finder для редагування.",
+    "Szablon binarny. Otwórz go w Finderze, aby edytować."
+  ],
+  "The template changed outside this window. Reload before saving.": [
+    "Шаблон изменен вне этого окна. Перезагрузите его перед сохранением.",
+    "Шаблон змінено поза цим вікном. Перезавантажте перед збереженням.",
+    "Szablon zmieniono poza tym oknem. Wczytaj go ponownie przed zapisem."
+  ],
+  "Save your changes or reload the current template before switching.": [
+    "Сохраните изменения или перезагрузите текущий шаблон перед переключением.",
+    "Збережіть зміни або перезавантажте поточний шаблон перед перемиканням.",
+    "Zapisz zmiany lub wczytaj bieżący szablon ponownie przed przełączeniem."
+  ],
+  "Installed supported applications appear in Finder automatically. Terminal opens the containing folder; editors receive selected files.": [
+    "Установленные поддерживаемые приложения появляются в Finder автоматически. Terminal открывает папку, редакторы открывают выбранные файлы.",
+    "Установлені підтримувані програми з’являються у Finder автоматично. Terminal відкриває теку, редактори відкривають вибрані файли.",
+    "Zainstalowane obsługiwane aplikacje pojawiają się automatycznie. Terminal otwiera folder, a edytory wybrane pliki."
+  ],
+  "No shortcuts are assigned by default.": [
+    "По умолчанию горячие клавиши не назначены.",
+    "За замовчуванням сполучення клавіш не призначені.",
+    "Domyślnie nie przypisano skrótów."
+  ],
+  "Record Shortcut": [
+    "Записать сочетание",
+    "Записати сполучення",
+    "Nagraj skrót"
+  ],
+  "Press shortcut (Esc cancels)": [
+    "Нажмите сочетание (Esc отменяет)",
+    "Натисніть сполучення (Esc скасовує)",
+    "Naciśnij skrót (Esc anuluje)"
+  ],
+  "Clear": [
+    "Сбросить",
+    "Очистити",
+    "Wyczyść"
+  ],
+  "Shortcuts work while Finder is active and request Automation permission on first use.": [
+    "Сочетания работают в активном Finder. При первом использовании нужен доступ к автоматизации.",
+    "Сполучення працюють в активному Finder. Під час першого використання потрібен доступ до автоматизації.",
+    "Skróty działają, gdy Finder jest aktywny. Pierwsze użycie wymaga dostępu do automatyzacji."
+  ],
+  "Show success notifications": [
+    "Уведомлять об успешных действиях",
+    "Сповіщати про успішні дії",
+    "Powiadamiaj o udanych działaniach"
+  ],
+  "Allow Notifications": [
+    "Разрешить уведомления",
+    "Дозволити сповіщення",
+    "Zezwól na powiadomienia"
+  ],
+  "Errors are always shown. Notification permission does not affect file actions.": [
+    "Ошибки показываются всегда. Разрешение уведомлений не влияет на действия с файлами.",
+    "Помилки показуються завжди. Дозвіл сповіщень не впливає на дії з файлами.",
+    "Błędy są zawsze pokazywane. Zgoda na powiadomienia nie wpływa na działania na plikach."
+  ],
+  "Project and releases": [
+    "Проект и выпуски",
+    "Проєкт і випуски",
+    "Projekt i wydania"
+  ],
+  "Check Connection": [
+    "Проверить соединение",
+    "Перевірити з’єднання",
+    "Sprawdź połączenie"
+  ],
+  "Refresh Status": [
+    "Обновить статус",
+    "Оновити стан",
+    "Odśwież stan"
+  ],
+  "Disconnect Helper": [
+    "Отключить помощника",
+    "Відключити помічника",
+    "Odłącz pomocnika"
+  ],
+  "Disconnect the helper before removing FinderPack from Applications.": [
+    "Отключите помощника перед удалением FinderPack из Программ.",
+    "Відключіть помічника перед видаленням FinderPack із Програм.",
+    "Odłącz pomocnika przed usunięciem FinderPack z Aplikacji."
+  ],
+  "Quit FinderPack": [
+    "Завершить FinderPack",
+    "Завершити FinderPack",
+    "Zakończ FinderPack"
+  ],
+  "Edit": [
+    "Правка",
+    "Редагування",
+    "Edycja"
+  ],
+  "Undo": [
+    "Отменить",
+    "Скасувати",
+    "Cofnij"
+  ],
+  "Cut": [
+    "Вырезать",
+    "Вирізати",
+    "Wytnij"
+  ],
+  "Copy": [
+    "Копировать",
+    "Копіювати",
+    "Kopiuj"
+  ],
+  "Paste": [
+    "Вставить",
+    "Вставити",
+    "Wklej"
+  ],
+  "Select All": [
+    "Выделить все",
+    "Вибрати все",
+    "Zaznacz wszystko"
+  ],
+  "Cancel": [
+    "Отмена",
+    "Скасувати",
+    "Anuluj"
+  ],
+  "Move Here": [
+    "Переместить сюда",
+    "Перемістити сюди",
+    "Przenieś tutaj"
+  ],
+  "Moving files. Originals are retained for recovery.": [
+    "Перемещение файлов. Оригиналы сохраняются для восстановления.",
+    "Переміщення файлів. Оригінали зберігаються для відновлення.",
+    "Przenoszenie plików. Oryginały są zachowane do odzyskania."
+  ],
+  "Stopping after the current safe step...": [
+    "Остановка после текущего безопасного шага...",
+    "Зупинка після поточного безпечного кроку...",
+    "Zatrzymywanie po bieżącym bezpiecznym kroku..."
+  ],
+  "Move stopped. Some files may already have moved. Existing data was kept. Check the destination and the move journal before retrying.": [
+    "Перемещение остановлено. Часть файлов уже могла переместиться. Данные сохранены. Проверьте папку назначения и журнал перед повтором.",
+    "Переміщення зупинено. Частина файлів уже могла переміститися. Дані збережено. Перевірте теку призначення та журнал перед повтором.",
+    "Przenoszenie zatrzymano. Część plików mogła zostać przeniesiona. Dane zachowano. Sprawdź folder docelowy i dziennik przed ponowieniem."
+  ],
+  "A shortcut is already in use. Choose another combination in Settings.": [
+    "Сочетание уже используется. Выберите другое в настройках.",
+    "Сполучення вже використовується. Виберіть інше в налаштуваннях.",
+    "Skrót jest już używany. Wybierz inny w ustawieniach."
+  ],
+  "Open a Finder window and allow Automation for FinderPack in System Settings to use shortcuts.": [
+    "Для горячих клавиш откройте окно Finder и разрешите автоматизацию FinderPack в Системных настройках.",
+    "Для сполучень відкрийте вікно Finder і дозвольте автоматизацію FinderPack у Системних параметрах.",
+    "Aby używać skrótów, otwórz okno Findera i zezwól na automatyzację FinderPack w Ustawieniach systemowych."
+  ],
+  "Directory template. Use Reveal to edit its contents.": [
+    "Шаблон папки. Откройте его в Finder для редактирования.",
+    "Шаблон теки. Відкрийте його у Finder для редагування.",
+    "Szablon folderu. Otwórz go w Finderze, aby edytować."
+  ],
+  "Recent file operations": [
+    "Последние операции с файлами",
+    "Останні операції з файлами",
+    "Ostatnie operacje na plikach"
+  ],
+  "Undo Move": [
+    "Вернуть перемещение",
+    "Скасувати переміщення",
+    "Cofnij przeniesienie"
+  ],
+  "Recovery copies are kept until you remove them. Reveal shows their locations.": [
+    "Копии для восстановления сохраняются до вашего удаления. Кнопка «Показать» откроет их расположение.",
+    "Копії для відновлення зберігаються до вашого видалення. Кнопка «Показати» відкриє їх розташування.",
+    "Kopie odzyskiwania pozostają do ich usunięcia. Pokaż otwiera ich lokalizacje."
+  ],
+  "A file with this name already exists.": [
+    "Файл с таким именем уже существует.",
+    "Файл із такою назвою вже існує.",
+    "Plik o tej nazwie już istnieje."
+  ],
+  "Keep Both": [
+    "Сохранить оба",
+    "Зберегти обидва",
+    "Zachowaj oba"
+  ],
+  "Replace and Keep Backup": [
+    "Заменить с сохранением копии",
+    "Замінити зі збереженням копії",
+    "Zastąp i zachowaj kopię"
+  ],
+  "Skip": [
+    "Пропустить",
+    "Пропустити",
+    "Pomiń"
+  ],
+  "Check for Updates": [
+    "Проверить обновления",
+    "Перевірити оновлення",
+    "Sprawdź aktualizacje"
+  ],
+  "Automatic updates are not configured for this build. Use Project and releases to check available downloads.": [
+    "Автообновления пока не настроены. Доступные сборки находятся по ссылке «Проект и выпуски».",
+    "Автооновлення ще не налаштовані. Доступні збірки містяться за посиланням «Проєкт і випуски».",
+    "Automatyczne aktualizacje nie są skonfigurowane. Dostępne wersje znajdziesz pod linkiem Projekt i wydania."
+  ],
+  "Reconnect the background helper in FinderPack settings to finish the update.": [
+    "Для завершения обновления подключите помощника в настройках FinderPack.",
+    "Для завершення оновлення підключіть помічника в налаштуваннях FinderPack.",
+    "Aby zakończyć aktualizację, połącz pomocnika w ustawieniach FinderPack."
+  ],
+  "Allow Automation for FinderPack in System Settings to open this terminal.": [
+    "Разрешите автоматизацию FinderPack в Системных настройках для открытия этого терминала.",
+    "Дозвольте автоматизацію FinderPack у Системних параметрах для відкриття цього термінала.",
+    "Zezwól na automatyzację FinderPack w Ustawieniach systemowych, aby otworzyć ten terminal."
+  ],
+  "Use outside Finder": [
+    "Использовать вне Finder",
+    "Використовувати поза Finder",
+    "Używaj poza Finderem"
+  ],
+  "Outside Finder, shortcuts use the frontmost Finder window, not the active application.": [
+    "Вне Finder сочетания используют переднее окно Finder, а не активное приложение.",
+    "Поза Finder сполучення використовують переднє вікно Finder, а не активну програму.",
+    "Poza Finderem skróty korzystają z przedniego okna Findera, nie z aktywnej aplikacji."
+  ],
+  "Notifications enabled.": [
+    "Уведомления включены.",
+    "Сповіщення ввімкнено.",
+    "Powiadomienia włączone."
+  ],
+  "Allow notifications in System Settings if you want success messages.": [
+    "Разрешите уведомления в настройках системы, чтобы получать сообщения об успехе.",
+    "Дозвольте сповіщення в параметрах системи, щоб отримувати повідомлення про успіх.",
+    "Zezwól na powiadomienia w Ustawieniach systemowych, aby otrzymywać potwierdzenia."
+  ],
+  "FinderPack reads Finder selections for shortcuts and opens terminal sessions when requested.": [
+    "FinderPack читает выделение Finder для горячих клавиш и открывает терминал по вашему запросу.",
+    "FinderPack читає вибрані об’єкти Finder для скорочень і відкриває термінал за вашим запитом.",
+    "FinderPack odczytuje zaznaczenie Findera dla skrótów i otwiera terminal na żądanie."
+  ],
+  "Preferred application": [
+    "Предпочитаемое приложение",
+    "Бажана програма",
+    "Preferowana aplikacja"
+  ],
+  "Group order": [
+    "Порядок групп",
+    "Порядок груп",
+    "Kolejność grup"
+  ],
+  "Apply to all conflicts": [
+    "Применить ко всем конфликтам",
+    "Застосувати до всіх конфліктів",
+    "Zastosuj do wszystkich konfliktów"
+  ]
+}

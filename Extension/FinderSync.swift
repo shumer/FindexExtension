@@ -8,7 +8,10 @@ final class FinderSync: FIFinderSync {
     @MainActor private static let actionClient = ActionClient()
     @MainActor private static let catalogClient = ActionClient()
     private static let actions = OSAllocatedUnfairLock(initialState: (next: 1, values: [Int: String]()))
-    private static let templates = OSAllocatedUnfairLock(initialState: [String]())
+    private static let context = OSAllocatedUnfairLock(initialState: (target: Optional<URL>.none, gitTarget: Optional<URL>.none))
+    private static let recents = OSAllocatedUnfairLock(initialState: [URL]())
+    private static let applications = OSAllocatedUnfairLock(initialState: [ApplicationChoice]())
+    private static let templates = OSAllocatedUnfairLock(initialState: (names: [String](), preferences: Preferences()))
     @MainActor private static var refreshTask: Task<Void, Never>?
 
     @MainActor private static var volumeObservers: [NSObjectProtocol] = []
@@ -43,8 +46,12 @@ final class FinderSync: FIFinderSync {
         guard refreshTask == nil else { return }
         refreshTask = Task {
             while !Task.isCancelled {
-                catalogClient.perform(ActionRequest(action: .catalog)) { response in
-                    templates.withLock { $0 = response.succeeded ? response.templates : [] }
+                let target = context.withLock { $0.target }
+                catalogClient.perform(ActionRequest(action: .catalog, target: target)) { response in
+                    context.withLock { $0.gitTarget = response.gitRoot == nil ? nil : target }
+                    applications.withLock { $0 = response.applications ?? [] }
+                    recents.withLock { $0 = response.recentDestinations ?? [] }
+                    templates.withLock { $0 = (response.succeeded ? response.templates : [], response.preferences ?? Preferences()) }
                 }
                 do { try await Task.sleep(for: .seconds(5)) } catch { return }
             }
@@ -59,20 +66,71 @@ final class FinderSync: FIFinderSync {
 
     override func menu(for menuKind: FIMenuKind) -> NSMenu? {
         let controller = FIFinderSyncController.default()
+        let target = controller.targetedURL()
+        Self.context.withLock { $0.target = target }
+        let hasGit = target != nil && Self.context.withLock { $0.gitTarget == target }
         let hasContext = controller.targetedURL() != nil || !(controller.selectedItemURLs() ?? []).isEmpty
         let menu = NSMenu(title: "FinderPack")
         menu.autoenablesItems = false
+        let snapshot = Self.templates.withLock { $0 }
+        let preferences = snapshot.preferences
+        defer {
+            let ordered = menu.items.sorted { left, right in
+                (preferences.groupOrder.firstIndex(of: left.identifier?.rawValue ?? "") ?? 100) <
+                    (preferences.groupOrder.firstIndex(of: right.identifier?.rawValue ?? "") ?? 100)
+            }
+            menu.removeAllItems()
+            for entry in ordered { menu.addItem(entry) }
+        }
         let copy = NSMenuItem(title: ProductText.value("copy"), action: nil, keyEquivalent: "")
         let formats = NSMenu()
         formats.autoenablesItems = false
-        for style in PathStyle.allCases where style != .gitRelative {
+        let orderedStyles = [preferences.defaultPath] + PathStyle.allCases.filter { $0 != preferences.defaultPath }
+        for style in orderedStyles where style != .gitRelative || hasGit {
             formats.addItem(item(ProductText.value(style.rawValue), value: "copy:" + style.rawValue, enabled: hasContext))
         }
+        copy.identifier = NSUserInterfaceItemIdentifier("copy")
         copy.submenu = formats
-        menu.addItem(copy)
-        let names = Self.templates.withLock { $0 }
+        if preferences.showCopy { menu.addItem(copy) }
+        if preferences.showOpen {
+            let open = NSMenuItem(title: ProductText.value("open"), action: nil, keyEquivalent: "")
+            let choices = NSMenu()
+            choices.autoenablesItems = false
+            open.identifier = NSUserInterfaceItemIdentifier("open")
+            let applications = Self.applications.withLock { $0 }.filter { !preferences.disabledApplications.contains($0.identifier) }.sorted {
+                if $0.identifier == preferences.preferredApplication { return true }
+                if $1.identifier == preferences.preferredApplication { return false }
+                return $0.name < $1.name
+            }
+            for application in applications {
+                choices.addItem(item(application.name, value: "open:" + application.identifier, enabled: hasContext))
+            }
+            if !choices.items.isEmpty { open.submenu = choices; menu.addItem(open) }
+        }
+        if preferences.showMove {
+            let move = NSMenuItem(title: ProductText.value("move"), action: nil, keyEquivalent: "")
+            let choices = NSMenu()
+            choices.autoenablesItems = false
+            choices.addItem(item(ProductText.value("chooseDestination"), value: "move:", enabled: !(controller.selectedItemURLs() ?? []).isEmpty))
+            choices.addItem(item(ProductText.value("cut"), value: "cut:", enabled: !(controller.selectedItemURLs() ?? []).isEmpty))
+            choices.addItem(item(ProductText.value("pasteFiles"), value: "paste:", enabled: target != nil))
+            choices.addItem(item(ProductText.value("pasteMove"), value: "pasteMove:", enabled: target != nil))
+            choices.addItem(item(ProductText.value("moveHere"), value: "moveHere:", enabled: target != nil))
+            for destination in Self.recents.withLock({ $0 }) {
+                choices.addItem(item(destination.lastPathComponent, value: "moveTo:" + destination.absoluteString,
+                                     enabled: !(controller.selectedItemURLs() ?? []).isEmpty))
+            }
+            choices.addItem(item(ProductText.value("undoMove"), value: "undo:", enabled: true))
+            move.identifier = NSUserInterfaceItemIdentifier("move")
+            move.submenu = choices
+            menu.addItem(move)
+        }
+        guard preferences.showNew else { return menu }
+        let names = snapshot.names
         if names.count == 1, let name = names.first {
-            menu.addItem(item(ProductText.value("new") + ": " + name, value: "new:" + name, enabled: hasContext))
+            let entry = item(ProductText.value("new") + ": " + name, value: "new:" + name, enabled: target != nil)
+            entry.identifier = NSUserInterfaceItemIdentifier("new")
+            menu.addItem(entry)
         } else {
             let create = NSMenuItem(title: ProductText.value("new"), action: nil, keyEquivalent: "")
             let choices = NSMenu()
@@ -80,8 +138,15 @@ final class FinderSync: FIFinderSync {
             if names.isEmpty {
                 choices.addItem(item(ProductText.value("loading"), value: "", enabled: false))
             } else {
-                for name in names { choices.addItem(item(name, value: "new:" + name, enabled: hasContext)) }
+                for name in names {
+                    let metadata = preferences.templates[name]
+                    let label = metadata?.label.isEmpty == false ? metadata!.label : name
+                    let entry = item(label, value: "new:" + name, enabled: target != nil)
+                    entry.image = NSImage(systemSymbolName: metadata?.symbol ?? "doc", accessibilityDescription: nil)
+                    choices.addItem(entry)
+                }
             }
+            create.identifier = NSUserInterfaceItemIdentifier("new")
             create.submenu = choices
             menu.addItem(create)
         }
@@ -112,8 +177,26 @@ final class FinderSync: FIFinderSync {
         let target = controller.targetedURL()
         let request: ActionRequest
         if value.hasPrefix("copy:"), let style = PathStyle(rawValue: String(value.dropFirst(5))) {
+            let base = target.map { url in
+                selected.contains(where: { $0.path == url.path }) ? url.deletingLastPathComponent() : url
+            }
             request = ActionRequest(action: .copyPath, urls: selected.isEmpty ? target.map { [$0] } ?? [] : selected,
-                                    target: target, style: style)
+                                    target: style == .relative ? base : target, style: style)
+        } else if value.hasPrefix("open:") {
+            request = ActionRequest(action: .openIn, urls: selected.isEmpty ? target.map { [$0] } ?? [] : selected,
+                                    application: String(value.dropFirst(5)))
+        } else if value.hasPrefix("moveTo:"), let destination = URL(string: String(value.dropFirst(7))) {
+            request = ActionRequest(action: .moveTo, urls: selected, destination: destination)
+        } else if value == "moveHere:" {
+            request = ActionRequest(action: .moveHere, target: target)
+        } else if value == "cut:" {
+            request = ActionRequest(action: .cut, urls: selected)
+        } else if value == "paste:" || value == "pasteMove:" {
+            request = ActionRequest(action: value == "paste:" ? .pasteFiles : .pasteMove, target: target)
+        } else if value == "move:" {
+            request = ActionRequest(action: .moveTo, urls: selected)
+        } else if value == "undo:" {
+            request = ActionRequest(action: .undoMove)
         } else if value.hasPrefix("new:") {
             request = ActionRequest(action: .newFile, target: target, template: String(value.dropFirst(4)))
         } else { return }

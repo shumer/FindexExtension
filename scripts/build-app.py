@@ -14,6 +14,7 @@ os.chdir(root)
 parser = argparse.ArgumentParser()
 parser.add_argument('--release', action='store_true', help='Require Developer ID signing for distribution')
 args = parser.parse_args()
+subprocess.run(['python3', str(root / 'scripts/fetch-dependencies.py')], check=True)
 config = json.loads((root / 'Config/build.json').read_text())
 name = config['name']
 prefix = config['bundleIdentifier']
@@ -62,6 +63,7 @@ sdk_version = capture('xcrun', '--show-sdk-version')
 architecture = capture('uname', '-m')
 if architecture not in ('arm64', 'x86_64'):
     raise SystemExit('Unsupported build architecture')
+architectures = ['arm64', 'x86_64'] if args.release else [architecture]
 number = capture('git', 'rev-list', '--count', 'HEAD')
 work = root / '.build/clt'
 work.mkdir(parents=True, exist_ok=True)
@@ -72,10 +74,20 @@ common = ['xcrun', 'swiftc', '-swift-version', config['swiftVersion'],
           '-module-cache-path', str(root / '.build/module-cache'), '-parse-as-library']
 link_flags = ['-Xlinker', '-platform_version', '-Xlinker', 'macos',
               '-Xlinker', minimum, '-Xlinker', sdk_version]
-core = work / 'libFinderPackCore.a'
-run(*common, '-emit-library', '-static', '-emit-module', '-module-name', 'FinderPackCore',
-    '-emit-module-path', work / 'FinderPackCore.swiftmodule',
-    *sorted((root / 'Sources/FinderPackCore').glob('*.swift')), '-o', core)
+def compiler_for(target_architecture):
+    result = common.copy()
+    result[result.index('-target') + 1] = f'{target_architecture}-apple-macos{minimum}'
+    return result
+
+libraries = {}
+for target_architecture in architectures:
+    target_work = work / target_architecture
+    target_work.mkdir(exist_ok=True)
+    core = target_work / 'libFinderPackCore.a'
+    run(*compiler_for(target_architecture), '-emit-library', '-static', '-emit-module', '-module-name', 'FinderPackCore',
+        '-emit-module-path', target_work / 'FinderPackCore.swiftmodule',
+        *sorted((root / 'Sources/FinderPackCore').glob('*.swift')), '-o', core)
+    libraries[target_architecture] = core
 
 stage = work / f'{name}.app'
 if stage.exists():
@@ -91,9 +103,37 @@ for kind, bundle in bundles.items():
     executable = bundle / 'Contents/MacOS' / product
     executable.parent.mkdir(parents=True, exist_ok=True)
     (bundle / 'Contents/Resources').mkdir(exist_ok=True)
+    translations = json.loads((root / 'Resources/Translations.json').read_text())
+    for language in ['en', 'ru', 'uk', 'pl']:
+        localized = bundle / 'Contents/Resources' / (language + '.lproj')
+        localized.mkdir(exist_ok=True)
+        def quoted(text):
+            return json.dumps(text, ensure_ascii=False)
+        lines = [quoted(key) + ' = ' + quoted(key if language == 'en' else values[['ru', 'uk', 'pl'].index(language)]) + ';'
+                 for key, values in translations.items()]
+        (localized / 'Localizable.strings').write_text('\n'.join(lines) + '\n')
+        if kind == 'Agent':
+            usage = 'FinderPack reads Finder selections for shortcuts and opens terminal sessions when requested.'
+            description = usage if language == 'en' else translations[usage][['ru', 'uk', 'pl'].index(language)]
+            (localized / 'InfoPlist.strings').write_text(quoted('NSAppleEventsUsageDescription') + ' = ' + quoted(description) + ';\n')
+
     extra = ['-application-extension', '-Xlinker', '-e', '-Xlinker', '_NSExtensionMain'] if kind == 'Extension' else []
-    run(*common, '-module-name', module, '-I', work, *sorted((root / 'Shared').glob('*.swift')),
-        *sorted((root / kind).glob('*.swift')), core, *link_flags, *extra, '-o', executable)
+    if kind == 'App':
+        framework_parent = bundle / 'Contents/Frameworks'
+        framework_parent.mkdir(exist_ok=True)
+        shutil.copytree(root / '.build/dependencies/Sparkle/Sparkle.framework', framework_parent / 'Sparkle.framework', symlinks=True)
+        extra += ['-F', str(root / '.build/dependencies/Sparkle'), '-framework', 'Sparkle',
+                  '-Xlinker', '-rpath', '-Xlinker', '@executable_path/../Frameworks']
+    slices = []
+    for target_architecture in architectures:
+        target_work = work / target_architecture
+        output_binary = executable if len(architectures) == 1 else target_work / (product + '-binary')
+        run(*compiler_for(target_architecture), '-module-name', module, '-I', target_work,
+            *sorted((root / 'Shared').glob('*.swift')), *sorted((root / kind).glob('*.swift')),
+            libraries[target_architecture], *link_flags, *extra, '-o', output_binary)
+        slices.append(output_binary)
+    if len(slices) > 1:
+        run('lipo', '-create', *slices, '-output', executable)
     replacements = {
         'EXECUTABLE_NAME': product, 'PRODUCT_NAME': product, 'PRODUCT_MODULE_NAME': module,
         'PRODUCT_BUNDLE_IDENTIFIER': prefix + ({'App': '', 'Agent': '.agent', 'Extension': '.extension'}[kind]),
@@ -113,6 +153,17 @@ for kind, bundle in bundles.items():
     info['CFBundleInfoDictionaryVersion'] = '6.0'
     info['CFBundleSupportedPlatforms'] = ['MacOSX']
     info['NSHighResolutionCapable'] = True
+    info['CFBundleLocalizations'] = ['en', 'ru', 'uk', 'pl']
+    if kind == 'App':
+        public_key = os.environ.get('SPARKLE_PUBLIC_KEY', '')
+        if public_key:
+            import base64
+            if len(base64.b64decode(public_key, validate=True)) != 32:
+                raise SystemExit('Invalid Sparkle public key')
+            info['SUPublicEDKey'] = public_key
+            info['SUFeedURL'] = 'https://github.com/shumer/FindexExtension/releases/latest/download/appcast.xml'
+            info['SUEnableAutomaticChecks'] = False
+            info['SUVerifyUpdateBeforeExtraction'] = True
     info['FinderPackBuildKind'] = 'developer-id' if identity else 'ad-hoc'
     (bundle / 'Contents/Info.plist').write_bytes(plistlib.dumps(info))
     entitlements = expand(plistlib.loads((root / f'Config/{kind}.entitlements').read_bytes()))
@@ -127,6 +178,17 @@ launch = {
     'ProcessType': 'Interactive', 'LimitLoadToSessionType': 'Aqua',
 }
 (launch_directory / f'{name}Agent.plist').write_bytes(plistlib.dumps(launch))
+framework = stage / 'Contents/Frameworks/Sparkle.framework'
+components = [framework / 'Versions/B/Autoupdate',
+              framework / 'Versions/B/XPCServices/Downloader.xpc',
+              framework / 'Versions/B/XPCServices/Installer.xpc',
+              framework / 'Versions/B/Updater.app', framework]
+for component in components:
+    signing = ['codesign', '--force', '--sign', identity[0] if identity else '-',
+               '--preserve-metadata=identifier,entitlements', '--options', 'runtime']
+    if identity:
+        signing += ['--timestamp']
+    run(*signing, component)
 for kind in ['Agent', 'Extension', 'App']:
     signing = ['codesign', '--force', '--sign', identity[0] if identity else '-',
                '--options', 'runtime', '--entitlements', str(work / f'{kind}.entitlements')]
@@ -144,5 +206,5 @@ output.parent.mkdir(exist_ok=True)
 if output.exists():
     shutil.rmtree(output)
 shutil.copytree(stage, output, symlinks=True)
-print(f'Built {output} ({version}, build {number}, {architecture}, SDK {sdk_version})')
+print(f"Built {output} ({version}, build {number}, {'+'.join(architectures)}, SDK {sdk_version})")
 print('Developer ID signed.' if identity else 'Ad-hoc development artifact; authenticated XPC requires Developer ID signing.')

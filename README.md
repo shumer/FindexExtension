@@ -1,107 +1,200 @@
 # FinderPack
 
-FinderPack is a macOS Finder utility in early development. The planned product adds
-file templates, path formats, terminal/editor actions and recoverable file moves.
-It targets macOS 14 and later. FinderPack and `com.shumer.finderpack` are provisional.
-The existing repository remains `shumer/FindexExtension` until explicitly renamed.
+[![Checks](https://github.com/shumer/FindexExtension/actions/workflows/checks.yml/badge.svg)](https://github.com/shumer/FindexExtension/actions/workflows/checks.yml)
 
-## Status
+FinderPack adds native commands to Finder for copying paths, creating files from templates,
+opening files in applications and moving files with recovery history.
 
-This is an installed, notarized engineering prototype, not a released product. App and Finder
-file/folder/toolbar diagnostic checks pass on macOS 26.6.2. The selected design is A:
-native top-level action groups. Copy Path and New File are implemented; see the verification
-report for the exact build and runtime checks.
-See [the roadmap](docs/roadmap.md) and [actual verification](docs/verification.md).
+macOS 14 or later. Release builds contain Apple Silicon and Intel binaries. Runtime testing
+currently covers Apple Silicon on macOS 26.6.2; other supported systems still need acceptance
+checks. The project is in development and no stable public release has been published.
 
-## Development
+## Features
 
-Command Line Tools and their macOS SDK are sufficient. Full Xcode and XcodeGen are not
-required. The build compiles Swift 6, links the extension through `NSExtensionMain`,
-assembles all three bundles and signs nested code before the containing application.
+- **Copy Path:** absolute path, shell quoting, file URL, browsing-folder relative, Git-root
+  relative, home-relative, filename, filename without extension and parent folder.
+  Multiple results can use newlines, spaces or commas. Git-relative output appears after
+  the background cache discovers a repository.
+- **New File:** text and directory templates, numbered collision handling, custom menu
+  labels, symbols and ordering. Import files by dropping them into Templates or using Import.
+- **Open In:** installed terminal and editor choices. Paths are passed as data, never as
+  unescaped shell source. See the adapter verification notes below.
+- **Move:** choose a destination, reuse five recent folders, cut, paste a copy, paste and move,
+  or explicitly move copied files. Conflict choices include Keep Both, Skip and replacement
+  with a retained backup. Ordinary paste never removes its source.
+- **Recovery:** persisted move records, recent operations in Settings and conditional undo.
+  Undo refuses to overwrite occupied paths or restore files changed after the operation.
+- **Settings:** native Menu, Templates, Applications, Shortcuts, Feedback and About sections.
+  English, Russian, Ukrainian and Polish product strings are included.
+- **Shortcuts:** record combinations for copying a path and creating a file. No defaults.
+  Finder-only registration is the default. Optional global shortcuts use the frontmost Finder window.
+
+## Install
+
+### From a signed release
+
+When a release is available, download its DMG from [Releases](https://github.com/shumer/FindexExtension/releases).
+
+1. Open the DMG and drag FinderPack into Applications.
+2. Launch FinderPack from Applications, not from the disk image.
+3. Use **Open Extension Settings** and enable the FinderPack extension in macOS.
+4. Use **Connect** to register its background helper. Approve background operation if macOS asks.
+5. Open a new Finder context menu. Settings changes appear in new menus within five seconds.
+
+Release assets include SHA-256 checksums and `build-info.json`. Signed releases require both
+application and DMG notarization. Do not remove quarantine attributes or disable Gatekeeper.
+If macOS rejects an artifact, check its source and report the error.
+
+### Build locally
+
+Command Line Tools are sufficient; full Xcode and a generated Xcode project are not required.
+Python 3, Ruby and the system signing tools must be available. Builds download the pinned
+Sparkle archive and verify its SHA-256 digest before use.
 
 ```sh
+xcode-select --install
+git clone https://github.com/shumer/FindexExtension.git
+cd FindexExtension
 ./run-tests.sh
-./scripts/check-source.sh
 ./scripts/typecheck-app.sh
-./build.sh --no-install
-```
-
-Output: `build/FinderPack.app`. Configuration is in `Config/build.json`; VERSION is the
-marketing version. The current build targets the host architecture. Universal distribution
-is a separate release decision.
-
-Like the reference projects, the build discovers Developer ID from the keychain when
-`CODESIGN_IDENTITY` is unset. Set it to the certificate SHA-1 or name to select an identity,
-or `-` for an explicit ad-hoc artifact. The team is derived from the selected identity;
-optional `DEVELOPMENT_TEAM` must match it. No private keys belong in source configuration.
-
-```sh
-CODESIGN_IDENTITY=- ./build.sh --no-install
 ./build.sh --release --no-install
 ```
 
-`--release` requires Developer ID and fails rather than falling back. It builds/signs the
-app but does not notarize or publish it. Ad-hoc builds permit artifact inspection, while
-service registration and authenticated XPC require the Developer ID build. Keychain access
-and timestamping may require execution outside a restricted build sandbox.
+A Developer ID Application identity with its private key must already be available in your
+Keychain. The build discovers it and derives the team identifier. To choose an identity,
+set `CODESIGN_IDENTITY` to its certificate name or SHA-1. No signing keys belong in the repo.
 
-The build does not install anything, register services, restart Finder or publish.
-The main window remains a diagnostic/setup harness. Finder actions follow the selected
-[design specification](docs/DesignSpec.md).
-Follow [the prototype checklist](docs/prototype-checklist.md) for installation testing.
+Output: `build/FinderPack.app`. The release build assembles universal binaries, signs nested
+components first and verifies the complete bundle. It does not install or publish anything.
 
-## Available Finder actions
-
-Copy Path offers POSIX, shell-quoted, file URL, browsing-folder relative, home-relative,
-basename, stem and parent formats. Multiple results use newlines. Git-relative output and
-separator preferences remain pending. Copying does not execute shell commands.
-
-New File loads regular-file templates from the App Group under
-`Library/Application Support/Templates`. Nine initial templates are seeded once; deleted
-templates stay deleted. External changes refresh asynchronously every five seconds.
-Files are limited to 1 MiB in this first delivery. UTF-8 text expands date, datetime,
-filename, author, year and UUID placeholders; other bytes remain unchanged. Date/year use
-UTC and datetime uses ISO 8601 UTC. Author currently uses the macOS account display name.
-Directory templates and custom metadata are not available yet.
-
-Creation reserves names exclusively, starting collisions at 2 before the extension.
-Symlink templates and symlink destination entries are not followed. The result is revealed
-in Finder. Write errors may leave a partial file, which is reported explicitly.
-Repeated request identifiers are rejected rather than repeating a potentially completed
-operation. Request receipts are retained in the group container for this prototype.
-
-Success notifications are optional through Enable Action Notifications in the setup window.
-Denied notification permission does not block actions. Errors are displayed in Finder.
-The menu uses an in-memory template snapshot, with no file reads or IPC during construction.
-
-## Finder diagnostics
-
-The app opens extension settings and checks whether the extension is enabled.
-With the provisional bundle identifier, inspect registration using:
+Notarize with your existing Keychain profile:
 
 ```sh
-pluginkit -m -i com.shumer.finderpack.extension
+./scripts/notarise.sh build/FinderPack.app FinderPack
 ```
 
-For an intentional development reset only:
+Then copy the stapled app into Applications and follow the setup steps above. When replacing
+an installed development build, disconnect its helper in About before replacing the app,
+then reopen it and reconnect. Do not restart Finder automatically.
+
+For compilation and artifact inspection without signing credentials:
 
 ```sh
-pluginkit -e use -i com.shumer.finderpack.extension
-killall Finder
+CODESIGN_IDENTITY=- ./build.sh --no-install
 ```
 
-Restarting Finder can interrupt work. Never do it automatically during a build or
-onboarding. Menu coverage outside ordinary local folders is unverified.
-Register services only from a stable installed app, and unregister before removing it.
+This ad-hoc build is not a distributable installation and cannot use the authenticated agent.
 
-## Documents
+## Templates
 
-- [Repository rules](CLAUDE.md)
+Templates live in the resolved App Group container under `Library/Application Support/Templates`.
+Use **Templates > Reveal** to open that location. The app and helper share this single store.
+Changes made outside the app refresh asynchronously.
+
+The first launch seeds plain text, Markdown, PHP, JavaScript, TypeScript, JSON, shell,
+`.gitignore` and `.env`. Deleted templates are not recreated. Templates can contain:
+
+| Token | Value |
+| --- | --- |
+| `{{date}}` | UTC date, YYYY-MM-DD |
+| `{{datetime}}` | ISO 8601 UTC timestamp |
+| `{{filename}}` | Actual reserved filename, including a collision number |
+| `{{author}}` | Configured author, or the macOS account display name |
+| `{{year}}` | Four-digit UTC year |
+| `{{uuid}}` | One UUID captured for the creation request |
+
+UTF-8 and BOM-marked UTF-16 are supported. Binary content stays unchanged. Import preserves
+placeholders rather than expanding them. Regular template files are limited to 1 MiB.
+Directory templates are supported; symlinks inside them are rejected rather than followed.
+New files use default permissions subject to umask, retain template execute bits and clear
+inherited ACLs. Failed creation can leave a partial result; the error reports that possibility.
+
+The editor detects external content changes before saving. Reload or save the current
+text before switching templates with unsaved edits. Deletion moves a template to Trash.
+
+## File operations and recovery
+
+Same-volume moves use an exclusive rename. Cross-volume moves copy to staging, verify
+content, permissions, modification times, extended attributes and ACLs, then keep the original
+under a recovery name on its original volume. Symlinks move as links; packages remain one item.
+
+Cross-volume filesystems that cannot preserve the verified metadata may reject a move. The
+source is retained. Cancellation stops at safe steps; a copy already in progress may need to
+finish before it can stop. A failed batch attempts to undo completed moves and retains its
+journal if recovery cannot complete.
+
+Recovery copies consume disk space. Recent operations offer Reveal and Undo Move. Retained
+copies are not silently purged. Before removing an old recovery copy yourself, verify the
+active file and any needed undo history. Undo is FinderPack's own operation, not Finder's
+Command-Z history. Disconnected volumes or external edits can prevent automatic recovery.
+
+Cut intent is bound to the clipboard change count and is lost when another app changes the
+clipboard or the helper restarts. **Paste (Copy)** always copies. **Paste and Move** requires
+valid FinderPack cut intent. **Move Copied Files Here** is a separate explicit move command.
+
+## Applications, shortcuts and permissions
+
+Application adapters cover Terminal, iTerm2, Ghostty, Warp, Alacritty, kitty, WezTerm, Hyper,
+VS Code, Cursor, PhpStorm, WebStorm, Sublime Text, Zed and Neovim. Only detected choices appear.
+Neovim is detected at the standard Homebrew executable locations. Editors receive selected
+files; terminal actions use the selected directories or files' containing directories.
+Multiple distinct folders produce separate terminal launches.
+
+Third-party terminal adapters are implemented from their documented interfaces but still
+need runtime checks with those applications installed. See [verification](docs/verification.md).
+
+Finder extension activation and background helper registration are separate. Basic file
+creation and path copying do not need Automation or Accessibility. Finder shortcuts and
+scripted terminal adapters ask for Automation when used. Notification permission is optional;
+errors remain visible when success notifications are disabled. Automatic rename is not used.
+
+## Updates and removal
+
+Sparkle 2 is embedded for signed updates. An update-enabled build requires a matching EdDSA
+public key and signed appcast. Until the release key and feed are configured, **Check for
+Updates** explains that automatic updates are unavailable and links remain available in About.
+An update unregisters the helper before installation and reconnects it after relaunch.
+A real two-version update test remains a release gate.
+
+To remove FinderPack, disconnect its helper in About, quit the app and move it from
+Applications to Trash. Your templates and recovery files stay in the App Group container.
+Review them before removing that container.
+
+## CI and releases
+
+[Checks](https://github.com/shumer/FindexExtension/actions/workflows/checks.yml) runs on pushes
+to main and pull requests: source validation, core checks, strict Swift typechecking,
+separate-volume recovery tests and an inspectable ad-hoc bundle.
+
+[Signed release candidate](https://github.com/shumer/FindexExtension/actions/workflows/release.yml)
+is manually dispatched on main with an existing `vX.Y.Z` tag. It verifies the tag against
+VERSION and main history, enforces increasing build numbers, signs and notarizes the app,
+creates a signed/notarized DMG and ZIP, signs the update archive, generates its appcast and
+uploads immutable assets to a **draft** release. It never falls back to ad-hoc signing or
+replaces published assets. Secrets are removed in an always-running cleanup step.
+
+Configure the repository's `release` environment with these secrets:
+
+- `DEVELOPER_ID_P12`: base64 certificate and private key.
+- `DEVELOPER_ID_P12_PASSWORD`: exact P12 export password.
+- `NOTARY_KEY_P8`: base64 App Store Connect API private key.
+- `NOTARY_KEY_ID` and `NOTARY_ISSUER_ID`.
+- `SPARKLE_PRIVATE_KEY`: Sparkle EdDSA private key in its exported base64 format.
+
+Set repository variable `SPARKLE_PUBLIC_KEY` to the matching public key. The workflow checks
+that the update keys match before importing the release certificate. See [release setup](docs/release.md)
+for key handling, publication order and recovery. This repository currently has no signing
+secrets configured; a signed GitHub release cannot run until they are supplied.
+
+## Development documents
+
+- [Selected design](docs/DesignSpec.md)
 - [Product specification](docs/Specification.md)
 - [Architecture](docs/architecture.md)
-- [Release procedure](docs/release.md)
+- [Verification and limitations](docs/verification.md)
 - [Roadmap](docs/roadmap.md)
-- [Architecture decision](docs/adr/0001-build-and-process-boundaries.md)
+- [Repository rules](CLAUDE.md)
 
-Use Conventional Commits. Report automated and manual verification in each PR.
-Do not equate source checks with Finder integration, notarization or OS compatibility.
+Before a commit, run `./run-tests.sh` and `./scripts/check-source.sh`. For application changes,
+also run `./build.sh`. Use `./scripts/check-cross-volume.sh` for the separate-volume fixture.
+Do not equate compilation or notarization with UI, update or compatibility acceptance.

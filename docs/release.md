@@ -1,6 +1,6 @@
 # Release procedure
 
-Status: planned procedure, not a working release pipeline yet. The checks workflow builds source and ad-hoc bundles on PRs; no publication workflow is enabled until the signed prototype passes.
+Status: implemented local tooling and manual draft-release CI. GitHub signing secrets and the Sparkle public variable are not yet configured. No stable release has been published.
 
 ## Prerequisites
 
@@ -33,10 +33,10 @@ history. This is not intrinsically monotonic across branches or rewritten histor
 releases come only from the protected main history, and CI must compare against the latest
 published build and reject an equal/lower value. Rebuilds must not overwrite published assets.
 
-## Proposed pipeline
+## Implemented pipeline
 
-1. Manually dispatch a release for an existing immutable tag, or push an explicitly designated
-   release tag. Verify tag equals VERSION and belongs to the release history. Create/use a draft.
+1. Dispatch `release.yml` from main with an existing `vX.Y.Z` tag. Verify tag equals VERSION
+   and belongs to main history. The workflow creates a new draft and refuses existing assets.
 2. Checkout that exact tag with full history. Run source checks, unit tests and `./build.sh --release --no-install`.
    Record and control the actual developer directory/compiler/SDK; a runner label alone does not pin its SDK.
 3. Import signing material into a temporary keychain. Configure noninteractive signing.
@@ -47,7 +47,7 @@ published build and reject an equal/lower value. Rebuilds must not overwrite pub
    a broken bundle by indiscriminate `codesign --deep` signing.
 5. Submit the app in a `ditto` ZIP via notarytool. Require Accepted, retrieve logs on failure,
    staple the app and validate its ticket. Run codesign and Gatekeeper assessment.
-6. Produce final update ZIP from the stapled app. Build/sign DMG with that app, background
+6. Produce final update ZIP from the stapled app. Build/sign DMG with that app
    and Applications symlink; notarize/staple/validate the DMG as well.
 7. Generate checksums and EdDSA signatures from final immutable bytes. Sign the archive,
    not the XML document. Generate appcast with correct version, OS floor and download URL.
@@ -101,3 +101,40 @@ An existing Keychain profile can submit the built app without exporting credenti
 The helper saves the submission result under `build/notary`, requires Accepted, staples
 and validates the ticket, and assesses the app with Gatekeeper. Rebuilding afterward
 requires a new submission for the changed binaries. This does not publish a release.
+
+## Configure GitHub
+
+Create the `release` environment and set the six secrets listed above. Set repository variable
+`SPARKLE_PUBLIC_KEY` to the matching public EdDSA key. GitHub cannot export secrets from a
+sibling repository. Supply credentials through GitHub settings or `gh secret set` from a
+protected local file; never put their values in an issue, commit, log or chat.
+
+The pinned Sparkle tools are downloaded by `scripts/fetch-dependencies.py`. Use the official
+`generate_keys` utility with a dedicated account and retain a secure backup. The release
+script accepts the exported base64 private key, checks it against the public key with
+CryptoKit and sends it to `generate_appcast` through standard input.
+
+The runner uses `macos-26`; compiler and SDK versions are recorded in build evidence rather
+than assumed from that label. Universal release binaries include arm64 and x86_64. The
+current local verification environment is Swift 6.4 with SDK 27.0; other available compiler
+versions must pass the same checks. Dependencies are version/hash pinned in
+`Config/dependencies.json`.
+
+## Local packaging
+
+After committing the release source and notarizing its app, run:
+
+```sh
+export CODESIGN_IDENTITY='Developer ID Application: Your Name (TEAMID)'
+./scripts/package-release.sh
+```
+
+This creates `build/FinderPack-VERSION-BUILD.zip` and `.dmg`, notarizes/staples the DMG using
+profile `FinderPack`, then writes `SHA256SUMS` and `build-info.json`. Existing artifacts cause
+failure. The ZIP contains the stapled app and is the input to Sparkle signing. The appcast
+uses the version-specific GitHub asset URL; clients obtain the feed from the latest stable
+release's `appcast.xml` asset.
+
+Before publishing a draft, verify all assets and the real upgrade path. Publishing the draft
+exposes its existing immutable assets and feed together. Never publish a feed pointing at
+missing or mutable archives. The workflow does not publish automatically.

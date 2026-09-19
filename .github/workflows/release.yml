@@ -1,0 +1,102 @@
+name: Signed release candidate
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag on main history (for example v0.1.0)
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: signed-release
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: macos-26
+    timeout-minutes: 60
+    environment: release
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ inputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+      FINDERPACK_NOTARY_PROFILE: FinderPack-CI
+      SPARKLE_PUBLIC_KEY: ${{ vars.SPARKLE_PUBLIC_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+      - name: Validate release source and version
+        run: |
+          python3 - <<'PY'
+          import os, re, subprocess
+          from pathlib import Path
+          tag = os.environ['RELEASE_TAG']
+          version = Path('VERSION').read_text().strip()
+          if not re.fullmatch(r'v\d+\.\d+\.\d+', tag) or tag != 'v' + version:
+              raise SystemExit('The release tag must match VERSION exactly')
+          subprocess.run(['git', 'merge-base', '--is-ancestor', 'HEAD', 'origin/main'], check=True)
+          subprocess.run(['git', 'diff', '--exit-code'], check=True)
+          PY
+      - name: Verify increasing published build number
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/releases" > "$RUNNER_TEMP/releases.json"
+          python3 - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          releases = json.loads((Path(os.environ['RUNNER_TEMP']) / 'releases.json').read_text())
+          published = [r for r in releases if not r['draft'] and not r['prerelease']]
+          if published:
+              latest = published[0]
+              assets = [a for a in latest['assets'] if a['name'] == 'build-info.json']
+              if len(assets) != 1:
+                  raise SystemExit('Latest release has no unambiguous build metadata')
+              old = json.loads(subprocess.check_output(['gh', 'api', '-H', 'Accept: application/octet-stream', assets[0]['url']]))
+              current = int(subprocess.check_output(['git', 'rev-list', '--count', 'HEAD']))
+              if current <= old['build']:
+                  raise SystemExit('The release build number must increase')
+          PY
+      - name: Check source and core behavior
+        run: ./scripts/typecheck-app.sh
+      - name: Validate update signing keys
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: xcrun swift -module-cache-path .build/module-cache scripts/check-update-key.swift
+      - name: Import release credentials
+        env:
+          DEVELOPER_ID_P12: ${{ secrets.DEVELOPER_ID_P12 }}
+          DEVELOPER_ID_P12_PASSWORD: ${{ secrets.DEVELOPER_ID_P12_PASSWORD }}
+          NOTARY_KEY_P8: ${{ secrets.NOTARY_KEY_P8 }}
+          NOTARY_KEY_ID: ${{ secrets.NOTARY_KEY_ID }}
+          NOTARY_ISSUER_ID: ${{ secrets.NOTARY_ISSUER_ID }}
+        run: python3 scripts/ci-signing.py
+      - name: Build signed application
+        run: ./build.sh --release --skip-tests --no-install
+      - name: Notarize application
+        run: ./scripts/notarise.sh build/FinderPack.app FinderPack-CI
+      - name: Package and notarize disk image
+        run: ./scripts/package-release.sh
+      - name: Sign update archive and generate feed
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: python3 scripts/generate-appcast.py
+      - name: Create immutable draft release
+        run: |
+          gh release create "$RELEASE_TAG" --draft --verify-tag --title "FinderPack $RELEASE_TAG" --notes-file docs/release-notes.md
+          gh release upload "$RELEASE_TAG" build/FinderPack-*.zip build/FinderPack-*.dmg build/SHA256SUMS build/build-info.json build/appcast.xml
+      - name: Retain notarization evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: notarization-evidence
+          path: |
+            build/notary/**/result.json
+            build/notary/**/notary-log.json
+            build/dmg-notary.json
+          if-no-files-found: ignore
+      - name: Remove signing credentials
+        if: always()
+        run: python3 scripts/ci-cleanup.py

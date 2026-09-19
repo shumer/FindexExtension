@@ -1,4 +1,4 @@
-name: Source checks
+name: Checks
 on:
   push:
     branches: [main]
@@ -23,6 +23,8 @@ jobs:
         run: ./scripts/check-source.sh
       - name: Core checks and application source typecheck
         run: ./scripts/typecheck-app.sh
+      - name: Cross-volume recovery checks
+        run: ./scripts/check-cross-volume.sh
   build:
     runs-on: macos-26
     timeout-minutes: 20
@@ -34,3 +36,12 @@ jobs:
         env:
           CODESIGN_IDENTITY: "-"
         run: ./build.sh --no-install
+
+      - name: Archive inspection bundle
+        run: ditto -c -k --sequesterRsrc --keepParent build/FinderPack.app build/FinderPack-inspection.zip
+      - name: Save inspectable build
+        uses: actions/upload-artifact@v4
+        with:
+          name: FinderPack-inspection-only
+          path: build/FinderPack-inspection.zip
+          retention-days: 7

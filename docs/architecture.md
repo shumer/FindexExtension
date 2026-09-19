@@ -71,3 +71,21 @@ Register the root filesystem and each mounted volume explicitly. Monitoring only
 did not expose the menu on an external FAT32 USB volume during testing. Refresh the set
 outside menu construction when workspace mount/unmount notifications arrive. Network
 and cloud-provider behavior still needs separate checks.
+
+
+## Implemented product services
+
+`FinderSync` caches menu descriptors, preferences, installed applications and a Git root.
+Its menu callback reads memory and captures selection; the agent performs file work after an
+authenticated, bounded version 2 action request. Request IDs are reserved before side effects,
+requests expire after five minutes and old receipts are pruned after two days. Retries never
+silently repeat a file operation.
+
+Preferences and templates use the resolved shared App Group. Settings save preferences
+atomically and the helper refreshes the menu catalog asynchronously. Template expansion is
+one pass, so replacement values cannot introduce recursively expanded tokens.
+
+`MoveEngine` owns pure file/journal operations. `MoveActions` serializes UI-triggered batches,
+selects conflict policies and runs disk work outside MainActor. Recovery intentionally keeps
+verified copies. Settings display recent batches and reveal all their recovery locations.
+See [ADR 0002](adr/0002-recovery-shortcuts-and-updates.md) for shortcuts and update decisions.

@@ -1,6 +1,7 @@
 import Foundation
 import FinderPackCore
 import os
+import Darwin
 
 var checks = 0
 @MainActor func expect(_ value: Bool, _ label: String) throws {
@@ -134,3 +135,137 @@ do {
     try expect(false, "Linked destination must fail")
 } catch is POSIXError { checks += 1 }
 print("Passed \(checks) total checks including concurrent creation.")
+
+let prefsStore = PreferencesStore(url: temporary.appendingPathComponent("Preferences.json"))
+var prefs = Preferences()
+prefs.separator = .comma
+prefs.author = "Example"
+prefs.templates["Text.txt"] = TemplateMetadata(label: "Notes", symbol: "note.text", order: -1)
+try prefsStore.save(prefs)
+try expect(try prefsStore.load() == prefs, "Atomic preferences round trip")
+try expect(prefs.sorted(["JSON.json", "Text.txt"]).first == "Text.txt", "Template metadata order")
+let repository = temporary.appendingPathComponent("Repository")
+try FileManager.default.createDirectory(at: repository.appendingPathComponent("nested"), withIntermediateDirectories: true)
+try Data("gitdir: /example/worktree".utf8).write(to: repository.appendingPathComponent(".git"))
+try expect(GitDiscovery.root(containing: repository.appendingPathComponent("nested"))?.path == repository.path, "Worktree git marker discovery")
+let importFolder = temporary.appendingPathComponent("Imported")
+try FileManager.default.createDirectory(at: importFolder, withIntermediateDirectories: true)
+let imported = try store.create(template: "Markdown.md", in: importFolder, expandPlaceholders: false)
+try expect(try String(contentsOf: imported, encoding: .utf8).contains("{{filename}}"), "Import preserves placeholders")
+
+let moveSource = temporary.appendingPathComponent("MoveSource")
+let moveTarget = temporary.appendingPathComponent("MoveTarget")
+try FileManager.default.createDirectory(at: moveSource, withIntermediateDirectories: true)
+try FileManager.default.createDirectory(at: moveTarget, withIntermediateDirectories: true)
+let moving = moveSource.appendingPathComponent("sample.txt")
+try Data("original".utf8).write(to: moving)
+try Data("existing".utf8).write(to: moveTarget.appendingPathComponent("sample.txt"))
+let engine = MoveEngine(journal: temporary.appendingPathComponent("MoveJournal"))
+let move = try engine.move(moving, to: moveTarget)
+try expect(move.destination.lastPathComponent == "sample 2.txt", "Move keeps existing destination")
+try expect(!FileManager.default.fileExists(atPath: moving.path), "Same-volume move removes source name")
+try expect(try String(contentsOf: moveTarget.appendingPathComponent("sample.txt"), encoding: .utf8) == "existing", "Move preserves pre-existing data")
+try engine.undo(move)
+try expect(try String(contentsOf: moving, encoding: .utf8) == "original", "Undo restores original")
+let changed = try engine.move(moving, to: moveTarget)
+try Data("edited after move".utf8).write(to: changed.destination)
+do {
+    try engine.undo(changed)
+    try expect(false, "Undo must refuse changed destination")
+} catch MoveError.changedSource { checks += 1 }
+let tree = moveSource.appendingPathComponent("Tree")
+try FileManager.default.createDirectory(at: tree.appendingPathComponent("Child"), withIntermediateDirectories: true)
+do {
+    _ = try engine.move(tree, to: tree.appendingPathComponent("Child"))
+    try expect(false, "Move must reject a descendant")
+} catch MoveError.unsafeLocation { checks += 1 }
+do {
+    _ = try engine.move(tree, to: moveTarget, cancelled: { true })
+    try expect(false, "Cancelled move must stop")
+} catch MoveError.cancelled { checks += 1 }
+try expect(FileManager.default.fileExists(atPath: tree.path), "Cancelled move preserves source")
+let linkSource = moveSource.appendingPathComponent("Shortcut")
+try FileManager.default.createSymbolicLink(atPath: linkSource.path, withDestinationPath: tree.path)
+let movedLink = try engine.move(linkSource, to: moveTarget)
+try expect(try FileManager.default.destinationOfSymbolicLink(atPath: movedLink.destination.path) == tree.path, "Move preserves symlink itself")
+try engine.undo(movedLink)
+print("Passed \(checks) checks including preferences, git discovery and move recovery.")
+
+let utf16 = Data([0xff, 0xfe]) + "Hello {{author}}".data(using: .utf16LittleEndian)!
+let rendered = TemplateRendering.render(utf16, values: ["author": "{{date}}", "date": "unexpected"])
+try expect(String(data: rendered.dropFirst(2), encoding: .utf16LittleEndian) == "Hello {{date}}", "UTF-16 preservation and single-pass substitution")
+let treeTemplate = store.directory.appendingPathComponent("Project")
+try FileManager.default.createDirectory(at: treeTemplate.appendingPathComponent("Sources"), withIntermediateDirectories: true)
+try Data("{{year}}".utf8).write(to: treeTemplate.appendingPathComponent("Sources/main.txt"))
+let project = try store.create(template: "Project", in: destination, date: Date(timeIntervalSince1970: 0))
+try expect(try String(contentsOf: project.appendingPathComponent("Sources/main.txt"), encoding: .utf8) == "1970", "Directory template rendering")
+let copied = try engine.copy(tree, to: moveTarget)
+try expect(FileManager.default.fileExists(atPath: tree.path) && FileManager.default.fileExists(atPath: copied.path), "Copy preserves its source")
+print("Passed \(checks) checks including template trees and encodings.")
+
+if let mount = ProcessInfo.processInfo.environment["FINDERPACK_TEST_VOLUME"] {
+    let remote = URL(fileURLWithPath: mount).appendingPathComponent(UUID().uuidString)
+    try FileManager.default.createDirectory(at: remote, withIntermediateDirectories: true)
+    defer { try? FileManager.default.removeItem(at: remote) }
+    let source = moveSource.appendingPathComponent("CrossVolume.txt")
+    try Data("cross-volume integrity".utf8).write(to: source)
+    let attribute = Data("preserved metadata".utf8)
+    let attributeResult = attribute.withUnsafeBytes { setxattr(source.path, "com.shumer.finderpack.test", $0.baseAddress, $0.count, 0, 0) }
+    try expect(attributeResult == 0, "Create cross-volume metadata fixture")
+    let aclProcess = Process()
+    aclProcess.executableURL = URL(fileURLWithPath: "/bin/chmod")
+    aclProcess.arguments = ["+a", "user:\(NSUserName()) allow read", source.path]
+    try aclProcess.run()
+    aclProcess.waitUntilExit()
+    try expect(aclProcess.terminationStatus == 0, "Create cross-volume ACL fixture")
+    let record = try engine.move(source, to: remote)
+    try expect(record.phase == "retained", "Cross-volume move keeps recoverable original")
+    try expect(try Data(contentsOf: record.retained) == Data(contentsOf: record.destination), "Cross-volume copies match")
+    try engine.undo(record)
+    try expect(try String(contentsOf: source, encoding: .utf8) == "cross-volume integrity", "Cross-volume undo restores source")
+    try expect(!FileManager.default.fileExists(atPath: record.destination.path), "Undo removes active destination name")
+    print("Passed \(checks) checks including a separate mounted volume.")
+}
+
+let recoverSource = moveSource.appendingPathComponent("Recover.txt")
+try Data("recoverable".utf8).write(to: recoverSource)
+var interrupted = try engine.move(recoverSource, to: moveTarget)
+interrupted.phase = "prepared"
+try JSONEncoder().encode(interrupted).write(to: engine.journal.appendingPathComponent(interrupted.id.uuidString + ".json"), options: .atomic)
+let recovered = try engine.records().first { $0.id == interrupted.id }!
+try expect(recovered.phase == "moved", "Recover rename interrupted before journal completion")
+try engine.undo(recovered)
+try expect(try String(contentsOf: recoverSource, encoding: .utf8) == "recoverable", "Recovered move can be undone")
+var oldRequest = try JSONSerialization.jsonObject(with: JSONEncoder().encode(action)) as! [String: Any]
+oldRequest["created"] = 0
+let stale = try JSONSerialization.data(withJSONObject: oldRequest)
+do {
+    _ = try ActionRequest.decode(stale)
+    try expect(false, "Old action request must not replay after receipt cleanup")
+} catch MessageError.invalidContext { checks += 1 }
+print("Passed \(checks) total checks including interrupted journals and stale requests.")
+
+let occupiedSource = moveSource.appendingPathComponent("Occupied.txt")
+try Data("original".utf8).write(to: occupiedSource)
+let occupiedRecord = try engine.move(occupiedSource, to: moveTarget)
+try Data("new original path occupant".utf8).write(to: occupiedSource)
+do {
+    try engine.undo(occupiedRecord)
+    try expect(false, "Undo must not overwrite a new original-path occupant")
+} catch MoveError.conflict { checks += 1 }
+try expect(try String(contentsOf: occupiedSource, encoding: .utf8) == "new original path occupant", "Undo preserves the new occupant")
+try expect(try String(contentsOf: occupiedRecord.destination, encoding: .utf8) == "original", "Blocked undo preserves moved content")
+let replaceSource = moveSource.appendingPathComponent("Replacement.txt")
+let replaceDestination = moveTarget.appendingPathComponent("Replacement.txt")
+let backupFolder = moveTarget.appendingPathComponent("ReplacementBackup")
+try FileManager.default.createDirectory(at: backupFolder, withIntermediateDirectories: true)
+try Data("new".utf8).write(to: replaceSource)
+try Data("old".utf8).write(to: replaceDestination)
+let batch = UUID()
+let backupRecord = try engine.move(replaceDestination, to: backupFolder, batch: batch)
+let replacementRecord = try engine.move(replaceSource, to: moveTarget, batch: batch)
+try engine.undo(replacementRecord)
+try engine.undo(backupRecord)
+try expect(try String(contentsOf: replaceSource, encoding: .utf8) == "new", "Replacement undo restores incoming file")
+try expect(try String(contentsOf: replaceDestination, encoding: .utf8) == "old", "Replacement undo restores replaced file")
+print("Passed \(checks) total checks including occupied-path and replacement recovery.")

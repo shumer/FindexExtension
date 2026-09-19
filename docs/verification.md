@@ -157,3 +157,24 @@ external-volume file actions, template refresh during an open menu, inherited AC
 crash/power-loss recovery, settings and accessibility acceptance. Directory templates,
 custom metadata, alternate text encodings, git-root discovery and separator preferences
 remain pending. Request receipts are retained without pruning in this prototype.
+
+
+## Product implementation checks, 2026-09-19
+
+The earlier sections record the installed action prototype, not acceptance of the latest UI.
+The new settings, templates, application adapters, move UI, shortcuts and Sparkle integration
+passed strict Swift 6 typechecking. Core checks now cover 64 scenarios on the host filesystem
+and 70 with a separate mounted APFS fixture. The fixture verifies cross-volume move/undo,
+ACLs and extended attributes. Additional checks cover directory templates, UTF-16, literal
+replacement values, preference ordering, Git discovery, changed-file refusal, cancellation,
+exclusive conflicts and interrupted journal reconstruction.
+
+A transitional settings build was accepted by notarization under submission
+`02c6a913-0f22-45fc-817b-49155c6f19a4`. Subsequent code changes require a fresh submission.
+The currently installed app remains the earlier action prototype. The native UI tool reports
+the Mac locked; latest UI installation, keyboard/locale/accessibility checks and terminal
+adapter acceptance remain pending. No third-party terminal was installed for adapter tests.
+
+GitHub repository signing secrets remain empty. The manual release workflow is implemented
+but must receive credentials before it can run. Sparkle's real two-version update test and
+clean-machine/other-OS acceptance are separate gates, not inferred from core tests.

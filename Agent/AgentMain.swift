@@ -48,7 +48,8 @@ struct AgentMain {
             listener.setConnectionCodeSigningRequirement(configuration.clientRequirement)
             listener.delegate = delegate
             listener.resume()
-            logger.info("Diagnostic agent started.")
+            ShortcutService.shared.start()
+            logger.info("Agent started.")
             withExtendedLifetime((listener, delegate)) { application.run() }
         } catch {
             logger.error("Agent configuration is invalid; refusing to start.")

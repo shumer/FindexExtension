@@ -132,7 +132,8 @@ start below 300 ms. Record OS, hardware and methodology. These are unverified ta
 Command Line Tools, Swift 6, macOS 14 minimum. Three application binaries and shared static
 module. `build.sh` owns bundle assembly and signing, locally and in CI. Full Xcode and a
 project generator are not required. This supersedes the original B-1 generator requirement.
-Planned runtime dependencies: Sparkle 2 and KeyboardShortcuts; pin when integrated.
+Runtime dependency: Sparkle 2.10.0, pinned by version and archive SHA-256. Shortcuts use
+Carbon RegisterEventHotKey instead of KeyboardShortcuts; see ADR 0002.
 Developer ID, hardened runtime, timestamps and target-specific entitlements. Sign inside out.
 Notarize/staple app and DMG. DMG includes Applications link and designed background; ZIP
 is the update archive. Sparkle signs final archive bytes with EdDSA; appcast carries the
@@ -161,3 +162,16 @@ the reference are not adopted as facts.
 
 Confirm final name/bundle ID, Team ID, public download hosting, commercial model, supported
 CPU architectures and access to macOS 14/15/26/27 test machines before distribution.
+
+
+## Implementation notes, 2026-09-19
+
+Cross-volume source removal is implemented as retaining the original under a recovery name
+on its volume. This deliberately favors recovery over immediate space reclamation. Directory
+templates reject all symlinks rather than copying external targets. Global shortcuts operate
+on the front Finder window. Automatic rename remains optional and is not implemented.
+
+Recent recovery history shows ten operation groups; persisted records remain available for
+recovery. Finder shortcut metadata, UI measurements, runtime language switching, designed
+DMG background and the performance budgets still need acceptance work. The current DMG uses
+a plain layout with an Applications link. Homebrew publication follows a stable release.
