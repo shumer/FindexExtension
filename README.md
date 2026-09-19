@@ -25,7 +25,14 @@ Clean-machine installation and broader runtime acceptance are still being tested
   with a retained backup. Ordinary paste never removes its source.
 - **Recovery:** persisted move records, recent operations in Settings and conditional undo.
   Undo refuses to overwrite occupied paths or restore files changed after the operation.
-- **Settings:** native Menu, Templates, Applications, Shortcuts, Feedback and About sections.
+- **Menu customization:** hide individual path formats, move commands, templates and the
+  hidden-file command. Empty groups disappear; hidden templates remain on disk.
+- **Favorite folders:** pin up to 20 move destinations, rename their menu labels and reorder
+  them. Favorites appear before recent folders without duplicate destinations.
+- **Setup status:** check extension activation, background approval, helper connectivity
+  and optional permissions. Buttons open the relevant settings or request access.
+- **Settings:** native Setup, Favorite Folders, Menu, Templates, Applications, Shortcuts,
+  Feedback and About sections.
   English, Russian, Ukrainian and Polish product strings are included.
 - **Hidden files:** Show/Hide Hidden Files in Finder menus and Menu settings sends
   Finder's native Command-Shift-Period command without restarting Finder. The title
@@ -207,3 +214,23 @@ secrets configured; a signed GitHub release cannot run until they are supplied.
 Before a commit, run `./run-tests.sh` and `./scripts/check-source.sh`. For application changes,
 also run `./build.sh`. Use `./scripts/check-cross-volume.sh` for the separate-volume fixture.
 Do not equate compilation or notarization with UI, update or compatibility acceptance.
+
+## Customize menus and pinned folders
+
+In Menu, expand Path commands or Move commands to choose individual entries. Templates
+has a Show template in Finder control; Applications already has per-application controls.
+Group visibility and ordering still apply. These changes only affect Finder menus, not
+recorded shortcuts. New menus refresh within five seconds.
+
+In Favorite Folders, use Add Folders, optionally enter a short menu label, and use the
+arrows to reorder entries. Remove Pin never deletes the folder. If a destination is
+missing or offline, the move fails without redirecting files somewhere else. Re-add a
+folder if it has moved or been renamed.
+
+Setup separates the extension, background registration and an actual helper response.
+Permissions listed there belong to FinderPackAgent. Opening the page does not request
+access. Grant optional Accessibility for hidden-file switching, Automation for Finder
+shortcuts, and notifications for success messages only when needed. Status refreshes
+while the page is open and when returning from System Settings.
+
+These customization and setup improvements are newer than public v0.1.1.

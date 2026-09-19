@@ -6,6 +6,8 @@ enum ProductText {
         let language = Locale.preferredLanguages.first?.prefix(2) ?? "en"
         let index = ["en": 0, "ru": 1, "uk": 2, "pl": 3][String(language)] ?? 0
         let labels: [String: [String]] = [
+            "favoriteDestinations": ["Favorite Folders", "Избранные папки", "Улюблені теки", "Ulubione foldery"],
+            "recentDestinations": ["Recent Folders", "Последние папки", "Останні теки", "Ostatnie foldery"],
             "hiddenFiles": ["Show/Hide Hidden Files", "Показать/скрыть скрытые файлы", "Показати/сховати приховані файли", "Pokaż/ukryj ukryte pliki"],
             "hiddenFinderUnavailable": ["Open Finder before changing hidden file visibility.", "Откройте Finder перед изменением видимости скрытых файлов.", "Відкрийте Finder перед зміною видимості прихованих файлів.", "Otwórz Finder przed zmianą widoczności ukrytych plików."],
             "hiddenPermission": ["Allow FinderPackAgent in System Settings > Privacy & Security > Accessibility, then try again.", "Разрешите FinderPackAgent в Системных настройках > Конфиденциальность и безопасность > Универсальный доступ, затем повторите попытку.", "Дозвольте FinderPackAgent у Системних параметрах > Приватність і безпека > Доступність, потім повторіть спробу.", "Zezwól FinderPackAgent w Ustawieniach systemowych > Prywatność i ochrona > Dostępność, a następnie spróbuj ponownie."],

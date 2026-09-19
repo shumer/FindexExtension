@@ -29,7 +29,7 @@ Long-running moves will show progress after one second with cancellation and rec
 
 ## Settings and onboarding
 
-Six sections: Menu, Templates, Applications, Shortcuts, Feedback and About.
+Eight sections: Setup, Favorite Folders, Menu, Templates, Applications, Shortcuts, Feedback and About.
 Use a 4 pt grid, 24 pt content inset, 12 pt row spacing and 16 pt template symbols.
 Body text uses the system 13 pt font, section headings 14 pt medium and window content
 headings 20 pt medium. Native control/window geometry takes precedence over mockup radii.
@@ -53,3 +53,18 @@ Selection approves A's information architecture and feedback direction. Generic 
 studies are not final artwork. The settings mockup is not a completed implementation.
 Template directories, custom metadata, author settings, shortcuts and moves remain
 separate roadmap items until implemented and verified.
+
+## Menu customization and setup status
+
+Keep individual visibility controls in Menu, with template visibility beside its editor
+and application visibility in Applications. Omit empty menu groups. The hidden-file
+command remains a neutral Show/Hide command, with a separate menu visibility preference.
+
+Favorite Folders uses native folder selection, editable short labels, ordering arrows
+and Remove Pin buttons. Show the full destination path under its label. In Finder,
+favorites precede recents in the existing Move menu; use section labels and star symbols.
+
+Setup distinguishes extension activation, helper registration/approval and verified
+helper response. Optional Accessibility, Finder Automation and notification permissions
+have feature-specific descriptions and explicit repair/request buttons. Never interpret
+an unqueried permission as granted or request access on page entry.

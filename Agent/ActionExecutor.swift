@@ -10,6 +10,17 @@ actor ActionExecutor {
 
     func perform(_ request: ActionRequest) async -> ActionReply {
         do {
+            if request.action == .setupStatus {
+                return ActionReply(requestID: request.id, succeeded: true, setupStatus: await PermissionStatus.snapshot())
+            }
+            if request.action == .requestAccessibility {
+                await PermissionStatus.requestAccessibility()
+                return ActionReply(requestID: request.id, succeeded: true, setupStatus: await PermissionStatus.snapshot())
+            }
+            if request.action == .requestFinderAutomation {
+                _ = await Task.detached { PermissionStatus.finderAutomation(prompt: true) }.value
+                return ActionReply(requestID: request.id, succeeded: true, setupStatus: await PermissionStatus.snapshot())
+            }
             let root = try SharedStorage.root()
             let preferences = try SharedStorage.preferences().load()
             let store = TemplateStore(directory: root.appendingPathComponent("Templates", isDirectory: true))
@@ -72,7 +83,7 @@ actor ActionExecutor {
             case .openIn:
                 guard let application = request.application else { throw MessageError.invalidContext }
                 try await ApplicationActions.open(application, urls: request.urls)
-            case .catalog, .enableNotifications: break
+            case .catalog, .enableNotifications, .setupStatus, .requestFinderAutomation, .requestAccessibility: break
             }
             return ActionReply(requestID: request.id, succeeded: true)
         } catch {

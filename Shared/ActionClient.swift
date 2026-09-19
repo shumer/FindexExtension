@@ -33,8 +33,8 @@ final class ActionClient {
             }
             connection.resume()
             timeout = Task { [weak self] in
-                let seconds = [FileAction.moveTo, .undoMove, .pasteFiles, .pasteMove, .moveHere].contains(request.action)
-                    ? 86_400 : (request.action == .enableNotifications || request.action == .openIn ? 300 : 15)
+                let seconds = request.action == .setupStatus ? 5 : [FileAction.moveTo, .undoMove, .pasteFiles, .pasteMove, .moveHere].contains(request.action)
+                    ? 86_400 : ([FileAction.enableNotifications, .openIn, .requestFinderAutomation].contains(request.action) ? 300 : 15)
                 do { try await Task.sleep(for: .seconds(seconds)) } catch { return }
                 self?.finish(failure)
             }

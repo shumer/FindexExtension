@@ -463,5 +463,240 @@
     "Переключает видимость штатной командой Finder без перезапуска. Требуется Универсальный доступ.",
     "Перемикає видимість штатною командою Finder без перезапуску. Потрібен дозвіл Доступності.",
     "Przełącza widoczność skrótem Findera bez ponownego uruchamiania. Wymagane uprawnienie Dostępność."
+  ],
+  "Setup": [
+    "Настройка",
+    "Налаштування",
+    "Konfiguracja"
+  ],
+  "Favorite Folders": [
+    "Избранные папки",
+    "Улюблені теки",
+    "Ulubione foldery"
+  ],
+  "Check setup status": [
+    "Проверьте настройку приложения",
+    "Перевірте налаштування програми",
+    "Sprawdź konfigurację aplikacji"
+  ],
+  "Open Setup": [
+    "Открыть настройку",
+    "Відкрити налаштування",
+    "Otwórz konfigurację"
+  ],
+  "Path commands": [
+    "Форматы копирования пути",
+    "Формати копіювання шляху",
+    "Formaty kopiowania ścieżki"
+  ],
+  "Move commands": [
+    "Команды перемещения",
+    "Команди переміщення",
+    "Polecenia przenoszenia"
+  ],
+  "Show hidden-file command in Finder": [
+    "Показывать команду скрытых файлов в Finder",
+    "Показувати команду прихованих файлів у Finder",
+    "Pokazuj polecenie ukrytych plików w Finderze"
+  ],
+  "Show template in Finder": [
+    "Показывать шаблон в Finder",
+    "Показувати шаблон у Finder",
+    "Pokazuj szablon w Finderze"
+  ],
+  "File actions": [
+    "Операции с файлами",
+    "Дії з файлами",
+    "Operacje na plikach"
+  ],
+  "Ready for file actions": [
+    "Все готово для работы с файлами",
+    "Усе готово до роботи з файлами",
+    "Gotowe do pracy z plikami"
+  ],
+  "Finish setup to use Finder commands": [
+    "Завершите настройку команд Finder",
+    "Завершіть налаштування команд Finder",
+    "Dokończ konfigurację poleceń Findera"
+  ],
+  "Finder extension": [
+    "Расширение Finder",
+    "Розширення Finder",
+    "Rozszerzenie Findera"
+  ],
+  "Background helper": [
+    "Фоновый помощник",
+    "Фоновий помічник",
+    "Pomocnik w tle"
+  ],
+  "Enabled": [
+    "Включено",
+    "Увімкнено",
+    "Włączone"
+  ],
+  "Not enabled": [
+    "Не включено",
+    "Не увімкнено",
+    "Niewłączone"
+  ],
+  "Approval needed": [
+    "Нужно разрешение macOS",
+    "Потрібен дозвіл macOS",
+    "Wymagana zgoda macOS"
+  ],
+  "Not connected": [
+    "Не подключен",
+    "Не підключено",
+    "Niepołączony"
+  ],
+  "Responding": [
+    "Работает, соединение проверено",
+    "Працює, з’єднання перевірено",
+    "Działa, połączenie sprawdzone"
+  ],
+  "Not responding": [
+    "Не отвечает",
+    "Не відповідає",
+    "Nie odpowiada"
+  ],
+  "Checking...": [
+    "Проверка...",
+    "Перевірка...",
+    "Sprawdzanie..."
+  ],
+  "Approve Background Access": [
+    "Разрешить фоновую работу",
+    "Дозволити фонову роботу",
+    "Zezwól na pracę w tle"
+  ],
+  "Retry": [
+    "Повторить проверку",
+    "Повторити перевірку",
+    "Sprawdź ponownie"
+  ],
+  "Optional permissions": [
+    "Разрешения для дополнительных функций",
+    "Дозволи для додаткових функцій",
+    "Uprawnienia funkcji dodatkowych"
+  ],
+  "These permissions enable extra features. Copying paths, templates and moves do not require them.": [
+    "Эти разрешения нужны для дополнительных функций. Копирование путей, шаблоны и перемещение работают без них.",
+    "Ці дозволи потрібні для додаткових функцій. Копіювання шляхів, шаблони та переміщення працюють без них.",
+    "Te uprawnienia dotyczą funkcji dodatkowych. Kopiowanie ścieżek, szablony i przenoszenie działają bez nich."
+  ],
+  "Hidden files": [
+    "Скрытые файлы",
+    "Приховані файли",
+    "Ukryte pliki"
+  ],
+  "Allowed": [
+    "Разрешено",
+    "Дозволено",
+    "Dozwolone"
+  ],
+  "Not allowed": [
+    "Нет разрешения",
+    "Немає дозволу",
+    "Brak uprawnienia"
+  ],
+  "Not requested": [
+    "Еще не запрашивалось",
+    "Ще не запитувалося",
+    "Jeszcze nie pytano"
+  ],
+  "Unknown": [
+    "Не удалось проверить",
+    "Не вдалося перевірити",
+    "Nie udało się sprawdzić"
+  ],
+  "Accessibility lets FinderPackAgent send Finder's Show/Hide shortcut.": [
+    "Универсальный доступ позволяет FinderPackAgent переключать видимость скрытых файлов.",
+    "Доступність дозволяє FinderPackAgent перемикати видимість прихованих файлів.",
+    "Dostępność pozwala FinderPackAgent przełączać widoczność ukrytych plików."
+  ],
+  "Allow Accessibility": [
+    "Разрешить Универсальный доступ",
+    "Дозволити Доступність",
+    "Zezwól na Dostępność"
+  ],
+  "Finder shortcuts": [
+    "Горячие клавиши Finder",
+    "Гарячі клавіші Finder",
+    "Skróty Findera"
+  ],
+  "Automation lets shortcuts read the Finder selection and folder.": [
+    "Автоматизация позволяет горячим клавишам получать выделение и текущую папку Finder.",
+    "Автоматизація дозволяє гарячим клавішам отримувати виділення та поточну теку Finder.",
+    "Automatyzacja pozwala skrótom odczytać zaznaczenie i bieżący folder Findera."
+  ],
+  "Allow Finder Access": [
+    "Разрешить доступ к Finder",
+    "Дозволити доступ до Finder",
+    "Zezwól na dostęp do Findera"
+  ],
+  "Open Automation Settings": [
+    "Настройки автоматизации",
+    "Налаштування автоматизації",
+    "Ustawienia automatyzacji"
+  ],
+  "Success notifications": [
+    "Уведомления об успехе",
+    "Сповіщення про успіх",
+    "Powiadomienia o powodzeniu"
+  ],
+  "Errors remain visible even when notifications are disabled.": [
+    "Сообщения об ошибках видны и без разрешения на уведомления.",
+    "Повідомлення про помилки видно й без дозволу на сповіщення.",
+    "Komunikaty o błędach są widoczne również bez zgody na powiadomienia."
+  ],
+  "Open Notification Settings": [
+    "Настройки уведомлений",
+    "Налаштування сповіщень",
+    "Ustawienia powiadomień"
+  ],
+  "Some terminal integrations also request Automation access when first used.": [
+    "Некоторые терминалы также запрашивают доступ к автоматизации при первом запуске команды.",
+    "Деякі термінали також запитують доступ до автоматизації під час першого запуску команди.",
+    "Niektóre terminale również proszą o dostęp do automatyzacji przy pierwszym użyciu polecenia."
+  ],
+  "Complete the permission request in macOS, then return here.": [
+    "Ответьте на запрос macOS и вернитесь сюда.",
+    "Дайте відповідь на запит macOS і поверніться сюди.",
+    "Odpowiedz na pytanie macOS i wróć tutaj."
+  ],
+  "Pinned folders appear before recent folders in the Move menu. Removing a pin does not delete the folder.": [
+    "Избранные папки идут перед последними в меню перемещения. Удаление из избранного не удаляет саму папку.",
+    "Улюблені теки йдуть перед останніми в меню переміщення. Видалення з улюблених не видаляє саму теку.",
+    "Ulubione foldery są przed ostatnimi w menu przenoszenia. Usunięcie przypięcia nie usuwa folderu."
+  ],
+  "Add Folders": [
+    "Добавить папки",
+    "Додати теки",
+    "Dodaj foldery"
+  ],
+  "No pinned folders yet.": [
+    "Избранных папок пока нет.",
+    "Улюблених тек поки немає.",
+    "Nie ma jeszcze przypiętych folderów."
+  ],
+  "Remove Pin": [
+    "Убрать из избранного",
+    "Прибрати з улюблених",
+    "Odepnij"
+  ],
+  "Unavailable folders stay pinned. A move to a missing folder stops without choosing another destination.": [
+    "Недоступные папки остаются в избранном. Если папка отсутствует, перемещение остановится без подстановки другого места.",
+    "Недоступні теки залишаються в улюблених. Якщо теки немає, переміщення зупиниться без вибору іншого місця.",
+    "Niedostępne foldery pozostają przypięte. Jeśli folder nie istnieje, przenoszenie zatrzyma się bez wyboru innego miejsca."
+  ],
+  "You can pin up to 20 folders.": [
+    "Можно добавить до 20 избранных папок.",
+    "Можна додати до 20 улюблених тек.",
+    "Możesz przypiąć do 20 folderów."
+  ],
+  "Setup Status": [
+    "Статус настройки",
+    "Стан налаштування",
+    "Stan konfiguracji"
   ]
 }

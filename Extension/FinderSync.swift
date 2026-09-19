@@ -49,6 +49,10 @@ final class FinderSync: FIFinderSync {
             while !Task.isCancelled {
                 let target = context.withLock { $0.target }
                 catalogClient.perform(ActionRequest(action: .catalog, target: target)) { response in
+                    guard response.succeeded else {
+                        canToggleHiddenFiles.withLock { $0 = false }
+                        return
+                    }
                     canToggleHiddenFiles.withLock { $0 = response.canToggleHiddenFiles == true }
                     context.withLock { $0.gitTarget = response.gitRoot == nil ? nil : target }
                     applications.withLock { $0 = response.applications ?? [] }
@@ -87,13 +91,13 @@ final class FinderSync: FIFinderSync {
         let copy = NSMenuItem(title: ProductText.value("copy"), action: nil, keyEquivalent: "")
         let formats = NSMenu()
         formats.autoenablesItems = false
-        let orderedStyles = [preferences.defaultPath] + PathStyle.allCases.filter { $0 != preferences.defaultPath }
+        let orderedStyles = preferences.visiblePathStyles
         for style in orderedStyles where style != .gitRelative || hasGit {
             formats.addItem(item(ProductText.value(style.rawValue), value: "copy:" + style.rawValue, enabled: hasContext))
         }
         copy.identifier = NSUserInterfaceItemIdentifier("copy")
         copy.submenu = formats
-        if preferences.showCopy { menu.addItem(copy) }
+        if preferences.showCopy && !formats.items.isEmpty { menu.addItem(copy) }
         if preferences.showOpen {
             let open = NSMenuItem(title: ProductText.value("open"), action: nil, keyEquivalent: "")
             let choices = NSMenu()
@@ -114,25 +118,46 @@ final class FinderSync: FIFinderSync {
             let move = NSMenuItem(title: ProductText.value("move"), action: nil, keyEquivalent: "")
             let choices = NSMenu()
             choices.autoenablesItems = false
-            choices.addItem(item(ProductText.value("chooseDestination"), value: "move:", enabled: !(controller.selectedItemURLs() ?? []).isEmpty))
-            choices.addItem(item(ProductText.value("cut"), value: "cut:", enabled: !(controller.selectedItemURLs() ?? []).isEmpty))
-            choices.addItem(item(ProductText.value("pasteFiles"), value: "paste:", enabled: target != nil))
-            choices.addItem(item(ProductText.value("pasteMove"), value: "pasteMove:", enabled: target != nil))
-            choices.addItem(item(ProductText.value("moveHere"), value: "moveHere:", enabled: target != nil))
-            for destination in Self.recents.withLock({ $0 }) {
-                choices.addItem(item(destination.lastPathComponent, value: "moveTo:" + destination.absoluteString,
-                                     enabled: !(controller.selectedItemURLs() ?? []).isEmpty))
+            let hasSelection = !(controller.selectedItemURLs() ?? []).isEmpty
+            let commands: [(MenuCommand, String, Bool)] = [
+                (.chooseDestination, "move:", hasSelection), (.cut, "cut:", hasSelection),
+                (.pasteFiles, "paste:", target != nil), (.pasteMove, "pasteMove:", target != nil),
+                (.moveHere, "moveHere:", target != nil)
+            ]
+            for (command, value, enabled) in commands where preferences.shows(command) {
+                choices.addItem(item(ProductText.value(command.rawValue), value: value, enabled: enabled))
             }
-            choices.addItem(item(ProductText.value("undoMove"), value: "undo:", enabled: true))
+            let destinations = preferences.menuDestinations(recent: Self.recents.withLock { $0 })
+            for favorite in [true, false] {
+                let group = destinations.filter { $0.favorite == favorite }
+                guard !group.isEmpty else { continue }
+                if !choices.items.isEmpty { choices.addItem(.separator()) }
+                let heading = NSMenuItem(title: ProductText.value(favorite ? "favoriteDestinations" : "recentDestinations"), action: nil, keyEquivalent: "")
+                heading.isEnabled = false
+                choices.addItem(heading)
+                for destination in group {
+                    let entry = item(destination.title, value: "moveTo:" + destination.url.absoluteString, enabled: hasSelection)
+                    entry.toolTip = destination.url.path
+                    if favorite { entry.image = NSImage(systemSymbolName: "star", accessibilityDescription: nil) }
+                    choices.addItem(entry)
+                }
+            }
+            if preferences.shows(.undoMove) {
+                if !destinations.isEmpty { choices.addItem(.separator()) }
+                choices.addItem(item(ProductText.value("undoMove"), value: "undo:", enabled: true))
+            }
             move.identifier = NSUserInterfaceItemIdentifier("move")
             move.submenu = choices
-            menu.addItem(move)
+            if !choices.items.isEmpty { menu.addItem(move) }
         }
-        let hidden = item(ProductText.value("hiddenFiles"), value: "hidden:toggle", enabled: Self.canToggleHiddenFiles.withLock { $0 })
-        hidden.identifier = NSUserInterfaceItemIdentifier("hiddenFiles")
-        menu.addItem(hidden)
+        if preferences.shows(.hiddenFiles) {
+            let hidden = item(ProductText.value("hiddenFiles"), value: "hidden:toggle", enabled: Self.canToggleHiddenFiles.withLock { $0 })
+            hidden.identifier = NSUserInterfaceItemIdentifier("hiddenFiles")
+            menu.addItem(hidden)
+        }
         guard preferences.showNew else { return menu }
-        let names = snapshot.names
+        let names = snapshot.names.filter { !preferences.disabledTemplates.contains($0) }
+        if names.isEmpty && !snapshot.names.isEmpty { return menu }
         if names.count == 1, let name = names.first {
             let entry = item(ProductText.value("new") + ": " + preferences.label(for: name), value: "new:" + name, enabled: target != nil)
             entry.image = NSImage(systemSymbolName: preferences.templates[name]?.symbol ?? "doc", accessibilityDescription: nil)

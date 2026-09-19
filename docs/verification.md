@@ -445,3 +445,34 @@ The local anonymous-download checks are in `build/public-release-check`.
 - This verifies the local build 11-to-13 public update on Apple Silicon macOS 26.6.2.
   The earlier build 8-to-9 lifecycle test is recorded above. Other Macs and macOS
   versions remain part of the compatibility acceptance work.
+
+## Menu and setup usability, 2026-09-19
+
+- All 101 core checks passed, including old-preference migration, visibility filtering,
+  favorite validation/deduplication, missing-destination safety and setup message contracts.
+  Strict application typechecking and the signed universal CLT build passed.
+- Local 0.1.1 build 14 was notarized and stapled. Submission
+  `1d67f179-e473-40c6-91ac-471b2a93e5e0` returned Accepted; the installed application
+  passed Gatekeeper as Notarized Developer ID.
+- Russian UI acceptance ran on Apple Silicon macOS 26.6.2. Setup correctly showed an
+  enabled extension with a disconnected helper, then confirmed the helper connection
+  after Connect. Accessibility and notifications showed Allowed, while Finder
+  Automation showed Not requested. Reading status did not prompt for permissions.
+- Added a fixture directory through the folder picker and changed its menu label.
+  Finder displayed it under Favorites before Recents. Selecting it moved the fixture
+  with intact content; Undo restored the source and removed the destination copy.
+  The same path appeared only once while both pinned and recently used.
+- Hiding File URL, Cut and Show/Hide Hidden Files removed those commands from the file
+  and blank-space menus. Restoring the switches restored the commands. Hiding the
+  JavaScript template removed only that template from New File, without deleting it.
+- Removing a favorite removed its menu section without deleting the directory.
+  Original user preferences were compared semantically with the saved backup after
+  cleanup. The original recent-folder list was restored after checking that its only
+  change was the fixture destination. The fixture move was fully undone.
+- Finder retained PID 577 through installation and all checks. No Finder restart or
+  system permission change was performed. The Russian setup layout was visually checked.
+- Permission denial/recovery prompts, multiple-favorite ordering in the installed UI,
+  complete keyboard/VoiceOver coverage and other OS/CPU combinations remain unverified
+  at runtime. Ordering and permission message validation have core coverage.
+- This is local acceptance of an unreleased change. Public v0.1.1 build 13 assets
+  remain unchanged.

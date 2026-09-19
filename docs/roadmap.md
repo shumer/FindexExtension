@@ -68,3 +68,13 @@ Compilation, notarization and core tests do not replace installed UI or compatib
   menus, and the Finder toolbar. Finder kept PID 577 throughout.
 - Published in v0.1.1 build 13 after signed CI, independent asset verification and
   a successful public Sparkle update from local build 11.
+
+## Menu and setup usability
+
+- Individual command and template visibility, with backward-compatible preferences.
+- Up to 20 pinned move destinations with labels, ordering and recent-folder deduplication.
+- Dedicated setup status, non-prompting helper permission checks and repair controls.
+- All 101 core checks and the signed universal CLT build passed.
+- Installed acceptance passed for granular command/template visibility, pinned-folder
+  moves and undo, and disconnected/connected setup status. User preferences restored.
+- Local build 14 is notarized and installed. These changes are not in a public release yet.

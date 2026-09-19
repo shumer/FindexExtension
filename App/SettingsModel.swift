@@ -19,17 +19,25 @@ final class SettingsModel: ObservableObject {
     @Published var extensionEnabled = false
     @Published var agentEnabled = false
     @Published var requestingNotifications = false
+    @Published var helperResponding = false
+    @Published var checkingSetup = false
+    @Published var agentRequiresApproval = false
+    @Published var permissions: SetupStatus?
+    @Published var requestingPermission = false
     @Published var failure: String?
     private var original: Data?
     private let client = ActionClient()
     private let notificationClient = ActionClient()
     private let visibilityClient = ActionClient()
     private let diagnostic = DiagnosticClient()
+    private let setupClient = ActionClient()
+    private let permissionClient = ActionClient()
     private var service: SMAppService { .agent(plistName: "FinderPackAgent.plist") }
 
     init() { reload() }
 
     func reload() {
+        refreshSetup()
         extensionEnabled = FIFinderSyncController.isExtensionEnabled
         agentEnabled = service.status == .enabled
         if !agentEnabled { canToggleHiddenFiles = false }
@@ -212,6 +220,7 @@ final class SettingsModel: ObservableObject {
         visibilityClient.perform(ActionRequest(action: .toggleHiddenFiles)) { [weak self] reply in
             self?.changingHiddenFiles = false
             if !reply.succeeded { self?.failure = reply.message }
+            self?.refreshSetup()
         }
     }
 
@@ -222,6 +231,83 @@ final class SettingsModel: ObservableObject {
         notificationClient.perform(ActionRequest(action: .enableNotifications)) { [weak self] reply in
             self?.requestingNotifications = false
             self?.message = reply.message
+            self?.refreshSetup()
         }
+    }
+
+    var setupReady: Bool { extensionEnabled && helperResponding }
+
+    func refreshSetup() {
+        extensionEnabled = FIFinderSyncController.isExtensionEnabled
+        agentEnabled = service.status == .enabled
+        agentRequiresApproval = service.status == .requiresApproval
+        guard agentEnabled else {
+            helperResponding = false
+            permissions = nil
+            canToggleHiddenFiles = false
+            return
+        }
+        guard !checkingSetup else { return }
+        checkingSetup = true
+        setupClient.perform(ActionRequest(action: .setupStatus)) { [weak self] reply in
+            guard let self else { return }
+            checkingSetup = false
+            guard service.status == .enabled else { return }
+            helperResponding = reply.succeeded && reply.setupStatus != nil
+            permissions = reply.succeeded ? reply.setupStatus : nil
+        }
+    }
+
+    func requestPermission(_ action: FileAction) {
+        guard !requestingPermission, [.requestAccessibility, .requestFinderAutomation].contains(action) else { return }
+        requestingPermission = true
+        permissionClient.perform(ActionRequest(action: action)) { [weak self] reply in
+            guard let self else { return }
+            requestingPermission = false
+            if reply.succeeded { permissions = reply.setupStatus }
+            else { failure = reply.message }
+            if action == .requestAccessibility, reply.setupStatus?.accessibility != true { openPrivacySettings("Privacy_Accessibility") }
+            refreshSetup()
+        }
+    }
+
+    func openPrivacySettings(_ pane: String) {
+        guard ["Privacy_Accessibility", "Privacy_Automation"].contains(pane),
+              let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?" + pane) else { return }
+        NSWorkspace.shared.open(url)
+    }
+
+    func openNotificationSettings() {
+        if let url = URL(string: "x-apple.systempreferences:com.apple.Notifications-Settings.extension") { NSWorkspace.shared.open(url) }
+    }
+
+    func addFavoriteFolders() {
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.allowsMultipleSelection = true
+        guard panel.runModal() == .OK else { return }
+        var folders = preferences.favoriteFolders
+        for url in panel.urls where !folders.contains(where: { $0.url.standardizedFileURL.path == url.standardizedFileURL.path }) {
+            folders.append(FavoriteFolder(url: url))
+        }
+        guard folders.count <= 20 else {
+            failure = NSLocalizedString("You can pin up to 20 folders.", comment: "")
+            return
+        }
+        preferences.favoriteFolders = folders
+    }
+
+    func renameFavorite(_ id: UUID, label: String) {
+        guard let index = preferences.favoriteFolders.firstIndex(where: { $0.id == id }) else { return }
+        var clean = label.filter { !$0.isNewline && $0 != "\0" }
+        while clean.utf8.count > 200 { clean.removeLast() }
+        preferences.favoriteFolders[index].label = clean
+    }
+
+    func reorderFavorite(_ id: UUID, offset: Int) {
+        guard let index = preferences.favoriteFolders.firstIndex(where: { $0.id == id }),
+              preferences.favoriteFolders.indices.contains(index + offset) else { return }
+        preferences.favoriteFolders.swapAt(index, index + offset)
     }
 }

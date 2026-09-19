@@ -294,3 +294,74 @@ let capableReply = ActionReply(requestID: UUID(), succeeded: true, canToggleHidd
 try expect(try JSONDecoder().decode(ActionReply.self, from: JSONEncoder().encode(capableReply)).canToggleHiddenFiles == true,
            "New helper advertises command support independently of Finder visibility")
 print("Passed \(checks) total checks including the Finder shortcut contract.")
+
+let legacyPreferences = try JSONDecoder().decode(Preferences.self, from: Data("{\"version\":1,\"showCopy\":false,\"author\":\"Existing author\"}".utf8))
+try legacyPreferences.validate()
+try expect(!legacyPreferences.showCopy && legacyPreferences.author == "Existing author", "Migration preserves existing preferences")
+try expect(legacyPreferences.favoriteFolders.isEmpty && legacyPreferences.disabledCommands.isEmpty && legacyPreferences.disabledTemplates.isEmpty,
+           "Older settings retain visible commands and start without favorites")
+var menuPreferences = legacyPreferences
+menuPreferences.defaultPath = .shellQuoted
+menuPreferences.disabledCommands = ["copy.shellQuoted", MenuCommand.cut.rawValue]
+menuPreferences.disabledTemplates = ["Text.txt"]
+menuPreferences.favoriteFolders = [FavoriteFolder(url: base, label: "Work"), FavoriteFolder(url: base.appendingPathComponent("other"))]
+try menuPreferences.validate()
+let restoredPreferences = try JSONDecoder().decode(Preferences.self, from: JSONEncoder().encode(menuPreferences))
+try expect(restoredPreferences == menuPreferences, "New menu preferences round-trip without losing old settings or favorite identity")
+try expect(!menuPreferences.visiblePathStyles.contains(.shellQuoted) && menuPreferences.defaultPath == .shellQuoted,
+           "Hiding the preferred path command does not reset the configured shortcut format")
+let destinations = menuPreferences.menuDestinations(recent: [base.appendingPathComponent("."), base.appendingPathComponent("recent"), base])
+try expect(destinations.count == 3 && destinations[0].title == "Work" && destinations[1].favorite && !destinations[2].favorite,
+           "Favorites precede recents and duplicate normalized destinations appear only once")
+menuPreferences.disabledCommands.append(MenuCommand.favoriteDestinations.rawValue)
+try expect(menuPreferences.menuDestinations(recent: [base]).first?.favorite == false,
+           "Hiding pinned destinations does not silently hide the same recent folder")
+menuPreferences.disabledCommands.append(MenuCommand.recentDestinations.rawValue)
+try expect(menuPreferences.menuDestinations(recent: [base]).isEmpty, "Both destination sections can be hidden")
+menuPreferences.disabledCommands = PathStyle.allCases.map { "copy." + $0.rawValue }
+try expect(menuPreferences.visiblePathStyles.isEmpty, "All path formats can be hidden without a forced fallback")
+try expect(FavoriteFolder(url: URL(fileURLWithPath: "/"), label: "  ").title == "/", "Root favorites have a usable fallback title")
+
+@MainActor func rejectPreferences(line: UInt = #line, _ edit: (inout Preferences) -> Void) throws {
+    var invalid = Preferences()
+    edit(&invalid)
+    do {
+        try invalid.validate()
+        try expect(false, "Malformed menu preferences must be rejected at line \(line)")
+    } catch MessageError.invalidContext { checks += 1 }
+}
+try rejectPreferences { $0.disabledCommands = ["unknownCommand"] }
+try rejectPreferences { $0.disabledCommands = ["cut", "cut"] }
+try rejectPreferences { $0.disabledTemplates = ["../outside"] }
+try rejectPreferences { $0.favoriteFolders = [FavoriteFolder(url: URL(string: "https://example.com/folder")!)] }
+try rejectPreferences { $0.favoriteFolders = [FavoriteFolder(url: URL(string: "file://remote.example/folder")!)] }
+try rejectPreferences { $0.favoriteFolders = [FavoriteFolder(url: base), FavoriteFolder(url: base.appendingPathComponent("."))] }
+let sameFavoriteID = UUID()
+try rejectPreferences { $0.favoriteFolders = [FavoriteFolder(id: sameFavoriteID, url: base), FavoriteFolder(id: sameFavoriteID, url: base.appendingPathComponent("other"))] }
+try rejectPreferences { $0.favoriteFolders = [FavoriteFolder(url: base, label: "Line\rBreak")] }
+try rejectPreferences { $0.favoriteFolders = [FavoriteFolder(url: base, label: String(repeating: "a", count: 201))] }
+try rejectPreferences { $0.favoriteFolders = (0...20).map { FavoriteFolder(url: base.appendingPathComponent(String($0))) } }
+
+let pinnedSource = moveSource.appendingPathComponent("PinnedSource.txt")
+try Data("keep the source".utf8).write(to: pinnedSource)
+let missingFavorite = temporary.appendingPathComponent("MissingFavorite")
+var rejectedMissingFavorite = false
+do { _ = try engine.move(pinnedSource, to: missingFavorite) }
+catch { rejectedMissingFavorite = true }
+try expect(rejectedMissingFavorite && FileManager.default.fileExists(atPath: pinnedSource.path) && !FileManager.default.fileExists(atPath: missingFavorite.path),
+           "Missing favorite preserves the source and does not create an unexpected folder")
+for action in [FileAction.setupStatus, .requestFinderAutomation, .requestAccessibility] {
+    let request = ActionRequest(action: action)
+    try expect(try ActionRequest.decode(JSONEncoder().encode(request)) == request, "Setup action round trip")
+    do {
+        _ = try ActionRequest.decode(JSONEncoder().encode(ActionRequest(action: action, application: "com.apple.Terminal")))
+        try expect(false, "Setup actions must not authorize arbitrary application targets")
+    } catch MessageError.invalidContext { checks += 1 }
+}
+let permissionSnapshot = SetupStatus(accessibility: true, finderAutomation: .notRequested, notifications: .denied)
+let statusReply = ActionReply(requestID: UUID(), succeeded: true, setupStatus: permissionSnapshot)
+try expect(try JSONDecoder().decode(ActionReply.self, from: JSONEncoder().encode(statusReply)).setupStatus == permissionSnapshot,
+           "Status reply preserves independent permission states")
+try expect(try JSONDecoder().decode(ActionReply.self, from: JSONEncoder().encode(oldReply)).setupStatus == nil,
+           "An older helper does not imply permission approval")
+print("Passed \(checks) total checks including menu migration, favorites and setup status.")

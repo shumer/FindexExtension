@@ -33,6 +33,9 @@ public struct Preferences: Codable, Sendable, Equatable {
     public var version = 1
     public var preferredApplication = "com.apple.Terminal"
     public var disabledApplications: [String] = []
+    public var disabledCommands: [String] = []
+    public var disabledTemplates: [String] = []
+    public var favoriteFolders: [FavoriteFolder] = []
     public var groupOrder = ["copy", "new", "open", "move"]
     public var showCopy = true
     public var showNew = true
@@ -47,7 +50,7 @@ public struct Preferences: Codable, Sendable, Equatable {
     public init() {}
 
     private enum CodingKeys: String, CodingKey {
-        case preferredApplication, disabledApplications, groupOrder
+        case preferredApplication, disabledApplications, groupOrder, disabledCommands, disabledTemplates, favoriteFolders
         case version, showCopy, showNew, showOpen, showMove, defaultPath, separator, notifySuccess, author, templates, shortcuts
     }
 
@@ -55,6 +58,9 @@ public struct Preferences: Codable, Sendable, Equatable {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         preferredApplication = try values.decodeIfPresent(String.self, forKey: .preferredApplication) ?? "com.apple.Terminal"
         disabledApplications = try values.decodeIfPresent([String].self, forKey: .disabledApplications) ?? []
+        disabledCommands = try values.decodeIfPresent([String].self, forKey: .disabledCommands) ?? []
+        disabledTemplates = try values.decodeIfPresent([String].self, forKey: .disabledTemplates) ?? []
+        favoriteFolders = try values.decodeIfPresent([FavoriteFolder].self, forKey: .favoriteFolders) ?? []
         groupOrder = try values.decodeIfPresent([String].self, forKey: .groupOrder) ?? ["copy", "new", "open", "move"]
         version = try values.decode(Int.self, forKey: .version)
         showCopy = try values.decodeIfPresent(Bool.self, forKey: .showCopy) ?? true
@@ -70,7 +76,15 @@ public struct Preferences: Codable, Sendable, Equatable {
     }
 
     public func validate() throws {
-        guard Set(groupOrder) == Set(["copy", "new", "open", "move"]), groupOrder.count == 4,
+        guard disabledCommands.count <= MenuCommand.identifiers.count,
+              Set(disabledCommands).count == disabledCommands.count,
+              Set(disabledCommands).isSubset(of: MenuCommand.identifiers),
+              disabledTemplates.count <= 1000, Set(disabledTemplates).count == disabledTemplates.count,
+              disabledTemplates.allSatisfy(ActionRequest.validName),
+              favoriteFolders.count <= 20, Set(favoriteFolders.map(\.id)).count == favoriteFolders.count,
+              Set(favoriteFolders.map { $0.url.standardizedFileURL.path }).count == favoriteFolders.count,
+              favoriteFolders.allSatisfy({ FavoriteFolder.validURL($0.url) && $0.label.utf8.count <= 200 && $0.label.rangeOfCharacter(from: .newlines) == nil && !$0.label.utf8.contains(0) }),
+              Set(groupOrder) == Set(["copy", "new", "open", "move"]), groupOrder.count == 4,
               preferredApplication.utf8.count < 200, disabledApplications.count <= 50,
               disabledApplications.allSatisfy({ $0.utf8.count < 200 }),
               Set(shortcuts.map { "\($0.keyCode):\($0.modifiers)" }).count == shortcuts.count,

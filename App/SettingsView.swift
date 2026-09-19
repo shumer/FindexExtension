@@ -3,11 +3,14 @@ import FinderPackCore
 import UniformTypeIdentifiers
 
 private enum SettingsSection: String, CaseIterable, Identifiable {
+    case setup = "Setup", folders = "Favorite Folders"
     case menu = "Menu", templates = "Templates", applications = "Applications"
     case shortcuts = "Shortcuts", feedback = "Feedback", about = "About"
     var id: String { rawValue }
     var symbol: String {
         switch self {
+        case .setup: return "checkmark.shield"
+        case .folders: return "star"
         case .menu: return "list.bullet"
         case .templates: return "doc.on.doc"
         case .applications: return "app.badge"
@@ -38,8 +41,16 @@ struct SettingsView: View {
         } detail: {
             VStack(alignment: .leading, spacing: 16) {
                 Text(LocalizedStringKey(section.rawValue)).font(.title2)
-                if !model.extensionEnabled || !model.agentEnabled { setup }
+                if !model.setupReady && section != .setup {
+                    HStack {
+                        Text("Check setup status").font(.callout)
+                        Spacer()
+                        Button("Open Setup") { navigation.section = .setup }
+                    }
+                }
                 switch section {
+                case .setup: SetupView(model: model)
+                case .folders: FavoriteFoldersView(model: model)
                 case .menu: menu
                 case .templates: templates
                 case .applications:
@@ -102,24 +113,22 @@ struct SettingsView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in model.reload() }
     }
 
-    private var setup: some View {
-        GroupBox {
-            VStack(alignment: .leading, spacing: 8) {
-                Label(LocalizedStringKey(model.extensionEnabled ? "Extension enabled" : "Enable the Finder extension"), systemImage: model.extensionEnabled ? "checkmark.circle" : "puzzlepiece.extension")
-                if !model.extensionEnabled { Button("Open Extension Settings", action: model.openExtensions) }
-                Label(LocalizedStringKey(model.agentEnabled ? "Background helper connected" : "Connect the background helper"), systemImage: model.agentEnabled ? "checkmark.circle" : "gearshape")
-                if !model.agentEnabled {
-                    HStack { Button("Connect", action: model.register); Button("Background Settings", action: model.openBackgroundSettings) }
-                }
-            }.frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-
     private var menu: some View {
         Form {
             Toggle("Copy Path", isOn: $model.preferences.showCopy)
+            DisclosureGroup("Path commands") {
+                ForEach(PathStyle.allCases, id: \.self) { style in
+                    Toggle(ProductText.value(style.rawValue), isOn: commandVisibility("copy." + style.rawValue))
+                }
+            }
             Toggle("New File", isOn: $model.preferences.showNew)
             Toggle("Move", isOn: $model.preferences.showMove)
+            DisclosureGroup("Move commands") {
+                ForEach(MenuCommand.allCases.filter { $0 != .hiddenFiles }, id: \.self) { command in
+                    Toggle(ProductText.value(command.rawValue), isOn: commandVisibility(command.rawValue))
+                }
+            }
+            Toggle("Show hidden-file command in Finder", isOn: commandVisibility(MenuCommand.hiddenFiles.rawValue))
             Button("Show/Hide Hidden Files", action: model.toggleHiddenFiles)
                 .disabled(!model.canToggleHiddenFiles || model.changingHiddenFiles)
             Text("Uses Finder's Show/Hide shortcut without restarting it. Accessibility permission is required.").font(.callout)
@@ -162,6 +171,13 @@ struct SettingsView: View {
         }.formStyle(.grouped)
     }
 
+    private func commandVisibility(_ command: String) -> Binding<Bool> {
+        Binding(get: { model.preferences.shows(command) }, set: { visible in
+            model.preferences.disabledCommands.removeAll { $0 == command }
+            if !visible { model.preferences.disabledCommands.append(command) }
+        })
+    }
+
     private func reorderGroup(_ group: String, offset: Int) {
         guard let index = model.preferences.groupOrder.firstIndex(of: group), model.preferences.groupOrder.indices.contains(index + offset) else { return }
         model.preferences.groupOrder.swapAt(index, index + offset)
@@ -194,6 +210,12 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     if let selected = model.selected {
                         Text(selected).font(.headline)
+                        Toggle("Show template in Finder", isOn: Binding(get: {
+                            !model.preferences.disabledTemplates.contains(selected)
+                        }, set: { visible in
+                            model.preferences.disabledTemplates.removeAll { $0 == selected }
+                            if !visible { model.preferences.disabledTemplates.append(selected) }
+                        }))
                         TextField("Menu label", text: metadata(selected, \.label))
                         Picker("Symbol", selection: metadata(selected, \.symbol)) {
                             ForEach(["doc", "doc.text", "chevron.left.forwardslash.chevron.right", "terminal", "note.text"], id: \.self) { symbol in
@@ -235,8 +257,7 @@ struct SettingsView: View {
             Text("\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "") (\(Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? ""))")
             Link("Project and releases", destination: URL(string: "https://github.com/shumer/FindexExtension")!)
             Button("Check for Updates", action: UpdateController.shared.check)
-            Button("Check Connection", action: model.checkConnection)
-            Button("Refresh Status", action: model.reload)
+            Button("Setup Status") { navigation.section = .setup }
             Button("Disconnect Helper", action: model.unregister)
             Text("Disconnect the helper before removing FinderPack from Applications.").font(.callout)
         }
