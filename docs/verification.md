@@ -178,3 +178,30 @@ adapter acceptance remain pending. No third-party terminal was installed for ada
 GitHub repository signing secrets remain empty. The manual release workflow is implemented
 but must receive credentials before it can run. Sparkle's real two-version update test and
 clean-machine/other-OS acceptance are separate gates, not inferred from core tests.
+
+## Latest build and CI evidence
+
+Source commit: `cd74ea9`. Local output: version 0.1.0, build 4, arm64 and x86_64, SDK 27.0.
+The universal app, agent, extension and nested Sparkle components passed Developer ID,
+hardened runtime, timestamp and strict signature verification.
+
+[GitHub Checks run 35408495513](https://github.com/shumer/FindexExtension/actions/runs/35408495513)
+passed both source and build jobs. This includes 70 checks with the separate APFS fixture,
+Swift typechecking and an ad-hoc inspection ZIP. The first run exposed a Swift 6.3.3 compiler
+IR generation crash caused by a direct actor-isolated method reference in a SwiftUI Binding.
+An explicit closure fixed it without disabling optimization or concurrency checks.
+
+Update tooling was tested with an ephemeral Curve25519 signing key: matching keys passed,
+missing and mismatched keys failed cleanly. Sparkle generated an appcast from a temporary
+application ZIP, and an independent CryptoKit check verified its EdDSA signature against
+those exact archive bytes. No production key was generated, exported or persisted. This
+verifies feed tooling, not the installed two-version update lifecycle.
+
+The latest app is signed but NOT notarized. A fresh submission failed before returning an
+ID because notarytool could not find Keychain profile `FinderPack`. The same failure occurred
+with the login keychain specified explicitly. Earlier accepted submissions do not cover the
+new binaries. Restore access to the profile and repeat notarization before packaging the
+final DMG. Do not distribute the latest local app as a notarized release.
+
+Outstanding external requirements: unlock the Mac for native UI checks, make the existing
+notarization profile available, and provision the GitHub release secrets/public update key.

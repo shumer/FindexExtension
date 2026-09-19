@@ -1,6 +1,6 @@
 # Release procedure
 
-Status: implemented local tooling and manual draft-release CI. GitHub signing secrets and the Sparkle public variable are not yet configured. No stable release has been published.
+Status: implemented local tooling and manual draft-release CI. GitHub signing secrets and the Sparkle public variable are not yet configured. No stable release has been published. The latest local build is signed but awaits notarization because profile FinderPack is currently unavailable.
 
 ## Prerequisites
 
