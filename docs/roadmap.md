@@ -81,3 +81,11 @@ Compilation, notarization and core tests do not replace installed UI or compatib
   successful public Sparkle update from local build 14.
 - Reworked the README around installation and first use, with real interface screenshots,
   separate usage/development guides, English settings screenshots and a Finder context-menu example.
+
+## Copy Path recovery
+
+- Recovered a disconnected helper and removed a duplicate inspection-extension registration.
+- Replaced the extension's blocking error dialog with a modeless alert so failed actions
+  do not stop Finder menu requests. Installed offline-error and clipboard checks passed.
+- Added a source-check guard against blocking modal loops in the extension. The local
+  fix is notarized; the public release remains v0.1.2 build 18.

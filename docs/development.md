@@ -42,6 +42,11 @@ CODESIGN_IDENTITY=- ./build.sh --no-install
 
 This ad-hoc build is not a distributable installation and cannot use the authenticated agent.
 
+Keep inspection copies of release apps archived after verification. macOS can discover
+and register extensions inside extracted build directories alongside the installed app.
+Unregister an inspection extension before archiving its app; retain the immutable release
+ZIP and DMG as evidence. Do not restart Finder as part of cleanup.
+
 ## CI and releases
 
 [Checks](https://github.com/shumer/FindexExtension/actions/workflows/checks.yml) runs on pushes

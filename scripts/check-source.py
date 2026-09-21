@@ -26,6 +26,9 @@ for path in root.rglob('*'):
             errors.append(f'{relative}:{number}: typographic dash')
         if line.rstrip() != line:
             errors.append(f'{relative}:{number}: trailing whitespace')
+    if relative.parts[0] == 'Extension' and path.suffix == '.swift':
+        if re.search(r'\brunModal\s*\(', text):
+            errors.append(f'{relative}: blocking modal loop in Finder extension')
     if path.suffix == '.json':
         json.loads(text)
     if path.suffix in {'.plist', '.entitlements'}:

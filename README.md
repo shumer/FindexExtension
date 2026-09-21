@@ -147,6 +147,10 @@ Finder context menu. Check that the relevant group is enabled in Menu settings.
 Privacy & Security > Accessibility**, then retry. It is a toggle, so its title does not
 claim whether hidden files are currently visible.
 
+**Copy Path leaves the clipboard unchanged.** Open **Setup** and check that the background
+helper is responding. Click **Connect** if it is disconnected, then retry the command in
+a new Finder menu. Copy Path writes text, so check it by pasting into a text field.
+
 **Why is my terminal or editor missing?** Open In lists supported applications that are
 installed and enabled in settings. See the [supported integrations](docs/usage.md#applications-shortcuts-and-permissions).
 Third-party terminal integrations still need broader runtime testing.

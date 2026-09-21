@@ -531,3 +531,29 @@ The local anonymous-download checks are in `build/public-release-check`.
   Visually checked that it shows a demo folder and the five FinderPack menu commands.
 - Added an English caption identifying the commands in the Russian Finder screenshot.
   Settings screenshots remain English. This is documentation only; VERSION stays 0.1.2.
+
+## Copy Path recovery, 2026-09-21
+
+- Reproduced an unresponsive extension on Apple Silicon macOS 27.0 (26A428).
+  Setup reported a disconnected helper. A process sample showed the extension's main
+  actor action task inside NSAlert.runModal while Finder menu requests were waiting.
+  The reason the helper became disconnected has not been established.
+- Reconnected the helper, restarted only the extension and removed a duplicate
+  registration from an extracted release inspection copy. Kept the release archives
+  and moved both old inspection apps to Trash after checking ZIP integrity.
+- Replaced the blocking modal loop with a retained, explicitly laid-out modeless
+  alert. Added a source-check guard; a synthetic modal-loop fixture was rejected and
+  a nonblocking fixture passed.
+- All 101 core checks, strict Swift 6 typechecking and the signed universal CLT
+  build passed. Installed local 0.1.2 build 20 with the existing update public key.
+  Notarization ec7e60e8-a8db-46e8-b569-1f1c598a50ce returned Accepted; stapling and
+  Gatekeeper assessment passed.
+- With the helper intentionally disconnected, Copy Path displayed a readable error
+  with one working OK button. While that error remained open, a fresh Finder context
+  menu and its Copy Path submenu still opened. Closed the error and reconnected the
+  helper; Setup confirmed a working connection.
+- Invoked Copy Path > Absolute Path on the supplied FinderPackMenu.png screenshot.
+  After asynchronous completion, pasted the exact file path into Finder's Go to
+  Folder text field and dismissed it without navigating. Finder kept PID 482.
+- VERSION and public release assets are unchanged. This is a local installed fix,
+  not a new public release or a full OS/architecture compatibility acceptance pass.

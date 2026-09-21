@@ -237,11 +237,7 @@ final class FinderSync: FIFinderSync {
         Task { @MainActor in
             Self.actionClient.perform(request) { response in
                 guard !response.succeeded else { return }
-                let alert = NSAlert()
-                alert.messageText = "FinderPack"
-                alert.informativeText = response.message
-                alert.addButton(withTitle: ProductText.value("ok"))
-                alert.runModal()
+                ActionErrorPresenter.shared.show(response.message)
             }
         }
     }
